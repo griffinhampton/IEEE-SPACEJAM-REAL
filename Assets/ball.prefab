@@ -153,3 +153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ceaa0f962370fc468f4254b876eba0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  goals: []
+  goalgravity: 40
+  body: {fileID: 4117254853834244465}
