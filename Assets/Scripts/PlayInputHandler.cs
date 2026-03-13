@@ -59,6 +59,11 @@ public class PlayInputHandler : MonoBehaviour
     //for context later, use force on ragdolls, dont move their position directly
 
     public Rigidbody hips;
+    [Header("Hands")]
+    public Rigidbody leftHand;
+    public Rigidbody rightHand;
+    public float handJumpForce = 5f;
+    public float handShootForce = 20f;
     public bool isGrounded;
 
 
@@ -158,7 +163,15 @@ public class PlayInputHandler : MonoBehaviour
         if (JumpTriggered && isGrounded)
         {
             hips.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            if (leftHand != null) leftHand.AddForce(Vector3.up * handJumpForce, ForceMode.Impulse);
+            if (rightHand != null) rightHand.AddForce(Vector3.up * handJumpForce, ForceMode.Impulse);
             JumpTriggered = false;
+        }
+
+        if (clicks >= 0)
+        {
+            if (leftHand != null) leftHand.AddForce(Vector3.up * handShootForce, ForceMode.Force);
+            if (rightHand != null) rightHand.AddForce(Vector3.up * handShootForce, ForceMode.Force);
         }
 
         transform.Rotate(Vector3.up * LookInput.x * turnSpeed);
