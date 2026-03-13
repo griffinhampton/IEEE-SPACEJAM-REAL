@@ -110,29 +110,13 @@ public class PlayInputHandler : MonoBehaviour
         movement();
     }
 
-    private void FixedUpdate()
+    private void StaticUpdate()
     {
-        if (hips == null)
+        if(hips==null)
         {
             return;
         }
-
-        if(MoveInput.y > 0)
-        {
-            hips.AddForce(-hips.transform.forward * speed * Mathf.Abs(MoveInput.y) * (SprintValue+1));
-        }
-        if(MoveInput.y < 0)
-        {
-            hips.AddForce(hips.transform.forward * speed * Mathf.Abs(MoveInput.y) * (SprintValue+1));
-        }
-        if(MoveInput.x > 0)
-        {
-            hips.AddForce(-hips.transform.right * speed * Mathf.Abs(MoveInput.x) * (SprintValue+1));
-        }
-        if(MoveInput.x < 0)
-        {
-            hips.AddForce(hips.transform.right * speed * Mathf.Abs(MoveInput.x) * (SprintValue+1));
-        }
+        //other movement stuff
     }
 
     void RegisterInputActions()
