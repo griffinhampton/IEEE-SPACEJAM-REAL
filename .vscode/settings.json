@@ -68,9 +68,6 @@
         "*.slnx": "*.csproj"
     },
     "IEEE-SPACEJAM-REAL-main.slnx=======dotnet.defaultSolution": "My project (1).slnx>>>>>>>3523942530d68c8062d0776f7da9f864af0415ad",
-<<<<<<< HEAD
+    "My project (1).slnx=======dotnet.defaultSolution": "IEEE-SPACEJAM-REAL.slnx>>>>>>>5786a952bde059ef1d7ea5a3b628a2dca23dbeb1",
     "dotnet.defaultSolution": "My project (1).slnx"
-=======
-    "dotnet.defaultSolution": "IEEE-SPACEJAM-REAL.slnx"
->>>>>>> 5786a952bde059ef1d7ea5a3b628a2dca23dbeb1
 }
