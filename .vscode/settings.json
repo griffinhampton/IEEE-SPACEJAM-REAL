@@ -60,16 +60,13 @@
         "*.asset": "yaml",
         "*.meta": "yaml",
         "*.prefab": "yaml",
-        "*.unity": "yaml",
+        "*.unity": "yaml"
     },
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-<<<<<<< HEAD
-    "dotnet.defaultSolution": "IEEE-SPACEJAM-REAL-main.slnx"
-=======
-    "dotnet.defaultSolution": "My project (1).slnx"
->>>>>>> 3523942530d68c8062d0776f7da9f864af0415ad
+    "IEEE-SPACEJAM-REAL-main.slnx=======dotnet.defaultSolution": "My project (1).slnx>>>>>>>3523942530d68c8062d0776f7da9f864af0415ad",
+    "dotnet.defaultSolution": "IEEE-SPACEJAM-REAL.slnx"
 }
