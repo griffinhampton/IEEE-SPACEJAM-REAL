@@ -40,13 +40,18 @@ public class logic : MonoBehaviour
             }
         }else if(balls.Length==1 && balls[0].transform.position.magnitude > 25){
             Destroy(balls[0]);
-            Instantiate(ball,ballspawn,Quaternion.identity);
+            spawnball();
         }
+    }
+
+    public void spawnball()
+    {
+        Instantiate(ball,ballspawn+new Vector3(Random.value*2,0,Random.value*2),Quaternion.identity);
     }
 
     public void score(int player)
     {
-        Instantiate(ball,ballspawn,Quaternion.identity);
+        spawnball();
         switch (player)
         {
             case 1:
