@@ -144,8 +144,16 @@ public class PlayInputHandler : MonoBehaviour
         {
             return;
         }
-
-        isGrounded = Physics.Raycast(hips.position, Vector3.down, 1.1f);
+        isGrounded = false;
+        RaycastHit[] hits = Physics.RaycastAll(hips.position, Vector3.down, 1.1f);
+        foreach (var hit in hits)
+        {
+            if (!hit.collider.isTrigger && !hit.transform.IsChildOf(transform))
+            {
+                isGrounded = true;
+                break;
+            }
+        }
 
         if (JumpTriggered && isGrounded)
         {
@@ -168,11 +176,11 @@ public class PlayInputHandler : MonoBehaviour
         }
         if (MoveInput.x > 0)
         {
-            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
         }
         if (MoveInput.x < 0)
         {
-            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
         }
 
         
