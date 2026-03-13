@@ -114,7 +114,7 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction.performed += context => SprintValue = context.ReadValue<float>();
         sprintAction.canceled += context => SprintValue = 0.0f;
 
-        shootAction.performed += context => clicks++;
+        shootAction.performed += context => ShootTriggered = true;
         
         inputAsset.FindActionMap(actionMapName).Enable();
     }
@@ -128,12 +128,13 @@ public class PlayInputHandler : MonoBehaviour
         }
         if (ShootTriggered && possession)
         {
+            Debug.Log(ShootTriggered+" "+possession);
             clicks++;
             ShootTriggered = false;
         }
-        if(clicks>=-1){
+        if(clicks>=0){
             Shoot();
-            Debug.Log(clicks);
+            //Debug.Log(clicks);
         }
         movement();
     }
@@ -144,8 +145,16 @@ public class PlayInputHandler : MonoBehaviour
         {
             return;
         }
-
-        isGrounded = Physics.Raycast(hips.position, Vector3.down, 1.1f);
+        isGrounded = false;
+        RaycastHit[] hits = Physics.RaycastAll(hips.position, Vector3.down, 1.1f);
+        foreach (var hit in hits)
+        {
+            if (!hit.collider.isTrigger && !hit.transform.IsChildOf(transform))
+            {
+                isGrounded = true;
+                break;
+            }
+        }
 
         if (JumpTriggered && isGrounded)
         {
@@ -168,11 +177,11 @@ public class PlayInputHandler : MonoBehaviour
         }
         if (MoveInput.x > 0)
         {
-            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
         }
         if (MoveInput.x < 0)
         {
-            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
         }
 
         
@@ -189,7 +198,7 @@ public class PlayInputHandler : MonoBehaviour
         float dz = initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle);
         float ay = Physics.gravity.y*.5f;
         float vy = initialvelocity*Mathf.Sin(vertangle);
-        if (step < 0)
+        if (step <= 0)
         {
             step = .05f;
         }
