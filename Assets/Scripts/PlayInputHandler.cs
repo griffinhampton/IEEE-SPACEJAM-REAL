@@ -86,14 +86,11 @@ public class PlayInputHandler : MonoBehaviour
             return;
         }
 
-<<<<<<< HEAD
-=======
         if (hips == null)
         {
             hips = GetComponent<Rigidbody>();
         }
 
->>>>>>> 10cb1a34c9e0e88cffd508b2d8f7099d7ba4190a
         moveAction = playerControls.FindActionMap(actionMapName).FindAction(move);
         lookAction = playerControls.FindActionMap(actionMapName).FindAction(look);
         jumpAction = playerControls.FindActionMap(actionMapName).FindAction(jump);
