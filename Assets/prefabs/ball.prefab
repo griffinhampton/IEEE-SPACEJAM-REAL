@@ -154,5 +154,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   goals: []
-  goalgravity: 40
+  goalgravity: 35
   body: {fileID: 4117254853834244465}

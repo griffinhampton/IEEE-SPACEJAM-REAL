@@ -8,6 +8,7 @@ TagManager:
   - goal
   - logic
   - node
+  - stars
   layers:
   - Default
   - TransparentFX

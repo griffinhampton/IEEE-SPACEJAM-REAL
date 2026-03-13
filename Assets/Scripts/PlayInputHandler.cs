@@ -5,6 +5,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 public class PlayInputHandler : MonoBehaviour
 {
     [Header("Input Action Asset")]
@@ -31,21 +32,42 @@ public class PlayInputHandler : MonoBehaviour
     public float SprintValue {get; private set;}
     public bool ShootTriggered { get; private set;}
 
-    [Header("Shot Variables")]
+    [Header("Shot specifiers")]
     public float vertangle;
     public float horizangle;
     public float initialvelocity;
-    public GameObject node;
     public float step;
     public float max;
     public float gravity;
-    private GameObject[] nodes;
+
+    [Header("Prefabs")]
+    public GameObject node;
     public GameObject ball;
-    private int clicks = 0;
-    private bool increase;
+    public GameObject ballchild;
+
+    [Header("Shooting mechanics")]
     public float angledelta = .5f;
     public float powerdelta = .5f;
     public float spawntime;
+
+    [Header("Movement Stuff")]
+    public float speed;
+    public float strafeSpeed;
+    public float jumpForce;
+    public float turnSpeed = 2f;
+
+    //for context later, use force on ragdolls, dont move their position directly
+
+    public Rigidbody hips;
+    public bool isGrounded;
+
+
+    private GameObject[] nodes;
+    private int clicks = -1;
+    private bool increase;
+    private float initangle;
+    private bool possession = false;
+
     public void ResetJump()
     {
         JumpTriggered = false;
@@ -58,44 +80,29 @@ public class PlayInputHandler : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+        }
+
+        if (hips == null)
+        {
+            hips = GetComponent<Rigidbody>();
+        }
+
+        InputActionAsset inputAsset;
+        if (TryGetComponent<PlayerInput>(out var pInput))
+        {
+            inputAsset = pInput.actions;
         }
         else
         {
-            Destroy(gameObject);
-            return;
+            inputAsset = Instantiate(playerControls);
         }
 
-
-        moveAction = playerControls.FindActionMap(actionMapName).FindAction(move);
-        lookAction = playerControls.FindActionMap(actionMapName).FindAction(look);
-        jumpAction = playerControls.FindActionMap(actionMapName).FindAction(jump);
-        sprintAction = playerControls.FindActionMap(actionMapName).FindAction(sprint);
-        shootAction = playerControls.FindActionMap(actionMapName).FindAction("Shoot");
-        RegisterInputActions();
-    }
-
-    void Update()
-    {
-        //Debug.Log(ShootTriggered);
-        //Physics.gravity = new Vector3(0,gravity,0);
-        nodes = GameObject.FindGameObjectsWithTag("node");
-        foreach(GameObject node in nodes)
-        {
-            Destroy(node);
-        }
-        if (ShootTriggered)
-        {
-            clicks++;
-            ShootTriggered = false;
-        }
-        if(clicks>=0){
-            Shoot();
-        }
-    }
-
-    void RegisterInputActions()
-    {
+        moveAction = inputAsset.FindActionMap(actionMapName).FindAction(move);
+        lookAction = inputAsset.FindActionMap(actionMapName).FindAction(look);
+        jumpAction = inputAsset.FindActionMap(actionMapName).FindAction(jump);
+        sprintAction = inputAsset.FindActionMap(actionMapName).FindAction(sprint);
+        shootAction = inputAsset.FindActionMap(actionMapName).FindAction("Shoot");
+        
         moveAction.performed += context => MoveInput = context.ReadValue<Vector2>();
         moveAction.canceled += context => MoveInput = Vector2.zero;
 
@@ -108,6 +115,80 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction.canceled += context => SprintValue = 0.0f;
 
         shootAction.performed += context => ShootTriggered = true;
+        
+        inputAsset.FindActionMap(actionMapName).Enable();
+    }
+
+    void Update()
+    {
+        nodes = GameObject.FindGameObjectsWithTag("node");
+        foreach(GameObject node in nodes)
+        {
+            Destroy(node);
+        }
+        if (ShootTriggered && possession)
+        {
+            Debug.Log(ShootTriggered+" "+possession);
+            clicks++;
+            ShootTriggered = false;
+        }
+        if(clicks>=0){
+            Shoot();
+            //Debug.Log(clicks);
+        }
+        movement();
+    }
+
+    private void FixedUpdate()
+    {
+        if (hips == null)
+        {
+            return;
+        }
+        isGrounded = false;
+        RaycastHit[] hits = Physics.RaycastAll(hips.position, Vector3.down, 1.1f);
+        foreach (var hit in hits)
+        {
+            if (!hit.collider.isTrigger && !hit.transform.IsChildOf(transform))
+            {
+                isGrounded = true;
+                break;
+            }
+        }
+
+        if (JumpTriggered && isGrounded)
+        {
+            hips.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            JumpTriggered = false;
+        }
+
+        transform.Rotate(Vector3.up * LookInput.x * turnSpeed);
+
+        Vector3 flatForward = Vector3.ProjectOnPlane(hips.transform.forward, Vector3.up).normalized;
+        Vector3 flatRight = Vector3.ProjectOnPlane(hips.transform.right, Vector3.up).normalized;
+
+        if (MoveInput.y > 0)
+        {
+            hips.AddForce(flatForward * speed * Mathf.Abs(MoveInput.y) * (SprintValue + 1));
+        }
+        if (MoveInput.y < 0)
+        {
+            hips.AddForce(-flatForward * speed * Mathf.Abs(MoveInput.y) * (SprintValue + 1));
+        }
+        if (MoveInput.x > 0)
+        {
+            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+        }
+        if (MoveInput.x < 0)
+        {
+            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+        }
+
+        
+    }
+
+
+    void movement(){
     }
 
     public void ShootPreview()
@@ -117,7 +198,7 @@ public class PlayInputHandler : MonoBehaviour
         float dz = initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle);
         float ay = Physics.gravity.y*.5f;
         float vy = initialvelocity*Mathf.Sin(vertangle);
-        if (step < 0)
+        if (step <= 0)
         {
             step = .05f;
         }
@@ -136,14 +217,15 @@ public class PlayInputHandler : MonoBehaviour
                 playerControls.FindActionMap(actionMapName).Disable();
                 playerControls.FindActionMap(actionMapName).FindAction("Shoot").Enable();
                 horizangle = transform.rotation.eulerAngles.y;
+                initangle = transform.rotation.eulerAngles.y;
                 initialvelocity = 10;
                 clicks++;
                 break;
             case 1:
                 horizangle = increase?horizangle+angledelta*Time.deltaTime:horizangle-angledelta*Time.deltaTime;
-                if (horizangle - transform.rotation.eulerAngles.y > Mathf.PI / 2 || horizangle - transform.rotation.eulerAngles.y < Mathf.PI / -2)
+                if (horizangle - initangle > Mathf.PI / 4 || horizangle - initangle < Mathf.PI / -4)
                 {
-                    Mathf.Clamp(horizangle,transform.rotation.eulerAngles.y-Mathf.PI/2,transform.rotation.eulerAngles.y+Mathf.PI/2 );
+                    horizangle = Mathf.Clamp(horizangle,initangle-Mathf.PI/4,initangle+Mathf.PI/4);
                     increase = !increase;
                 }
                 break;
@@ -151,7 +233,7 @@ public class PlayInputHandler : MonoBehaviour
                 initialvelocity = increase?initialvelocity+powerdelta*Time.deltaTime:initialvelocity-powerdelta*Time.deltaTime;
                 if (initialvelocity - 10 > 5 || initialvelocity - 10 < -5)
                 {
-                    Mathf.Clamp(initialvelocity,5,15);
+                    initialvelocity = Mathf.Clamp(initialvelocity,5,15);
                     increase = !increase;
                 }
                 break;
@@ -165,6 +247,8 @@ public class PlayInputHandler : MonoBehaviour
                 test.linearVelocity = new Vector3(initialvelocity*Mathf.Cos(vertangle)*Mathf.Sin(horizangle),initialvelocity*Mathf.Sin(vertangle),initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle));
                 playerControls.FindActionMap(actionMapName).Enable();
                 clicks=-1;
+                possession = false;
+                ballchild.SetActive(false);
                 break;
         }
     }
@@ -179,4 +263,15 @@ public class PlayInputHandler : MonoBehaviour
         if (moveAction == null) return;
         playerControls.FindActionMap(actionMapName).Disable();
     }
+
+    void OnCollisionEnter(Collision collider){
+        if(collider.gameObject.CompareTag("ball")){
+            Debug.Log("grab ball");
+            possession = true;
+            ballchild.SetActive(true);
+            Destroy(collider.gameObject);
+        }
+    }
+
+    bool hasBall(){return possession;}
 }
