@@ -119,7 +119,7 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction.performed += context => SprintValue = context.ReadValue<float>();
         sprintAction.canceled += context => SprintValue = 0.0f;
 
-        shootAction.performed += context => clicks++;
+        shootAction.performed += context => ShootTriggered = true;
         
         inputAsset.FindActionMap(actionMapName).Enable();
     }
@@ -133,12 +133,13 @@ public class PlayInputHandler : MonoBehaviour
         }
         if (ShootTriggered && possession)
         {
+            Debug.Log(ShootTriggered+" "+possession);
             clicks++;
             ShootTriggered = false;
         }
-        if(clicks>=-1){
+        if(clicks>=0){
             Shoot();
-            Debug.Log(clicks);
+            //Debug.Log(clicks);
         }
         movement();
     }
@@ -210,7 +211,7 @@ public class PlayInputHandler : MonoBehaviour
         float dz = initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle);
         float ay = Physics.gravity.y*.5f;
         float vy = initialvelocity*Mathf.Sin(vertangle);
-        if (step < 0)
+        if (step <= 0)
         {
             step = .05f;
         }
