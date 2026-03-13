@@ -43,6 +43,7 @@ public class PlayInputHandler : MonoBehaviour
     [Header("Prefabs")]
     public GameObject node;
     public GameObject ball;
+    public GameObject ballchild;
 
     [Header("Shooting mechanics")]
     public float angledelta = .5f;
@@ -65,6 +66,7 @@ public class PlayInputHandler : MonoBehaviour
     private int clicks = -1;
     private bool increase;
     private float initangle;
+    private bool possession = false;
 
     public void ResetJump()
     {
@@ -123,6 +125,11 @@ public class PlayInputHandler : MonoBehaviour
         foreach(GameObject node in nodes)
         {
             Destroy(node);
+        }
+        if (ShootTriggered && possession)
+        {
+            clicks++;
+            ShootTriggered = false;
         }
         if(clicks>=-1){
             Shoot();
@@ -195,7 +202,7 @@ public class PlayInputHandler : MonoBehaviour
     //[ContextMenu("Shoot ball")]
     public void Shoot()
     {
-        //ShootPreview();
+        ShootPreview();
         switch (clicks){
             case 0:
                 playerControls.FindActionMap(actionMapName).Disable();
@@ -231,6 +238,8 @@ public class PlayInputHandler : MonoBehaviour
                 test.linearVelocity = new Vector3(initialvelocity*Mathf.Cos(vertangle)*Mathf.Sin(horizangle),initialvelocity*Mathf.Sin(vertangle),initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle));
                 playerControls.FindActionMap(actionMapName).Enable();
                 clicks=-1;
+                possession = false;
+                ballchild.SetActive(false);
                 break;
         }
     }
@@ -245,4 +254,15 @@ public class PlayInputHandler : MonoBehaviour
         if (moveAction == null) return;
         playerControls.FindActionMap(actionMapName).Disable();
     }
+
+    void OnCollisionEnter(Collision collider){
+        if(collider.gameObject.CompareTag("ball")){
+            Debug.Log("grab ball");
+            possession = true;
+            ballchild.SetActive(true);
+            Destroy(collider.gameObject);
+        }
+    }
+
+    bool hasBall(){return possession;}
 }
