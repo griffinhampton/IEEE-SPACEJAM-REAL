@@ -53,6 +53,7 @@ public class PlayInputHandler : MonoBehaviour
     public float speed;
     public float strafeSpeed;
     public float jumpForce;
+    public float turnSpeed = 2f;
 
     //for context later, use force on ragdolls, dont move their position directly
 
@@ -77,12 +78,6 @@ public class PlayInputHandler : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
         }
 
         if (hips == null)
@@ -90,12 +85,36 @@ public class PlayInputHandler : MonoBehaviour
             hips = GetComponent<Rigidbody>();
         }
 
-        moveAction = playerControls.FindActionMap(actionMapName).FindAction(move);
-        lookAction = playerControls.FindActionMap(actionMapName).FindAction(look);
-        jumpAction = playerControls.FindActionMap(actionMapName).FindAction(jump);
-        sprintAction = playerControls.FindActionMap(actionMapName).FindAction(sprint);
-        shootAction = playerControls.FindActionMap(actionMapName).FindAction("Shoot");
-        RegisterInputActions();
+        InputActionAsset inputAsset;
+        if (TryGetComponent<PlayerInput>(out var pInput))
+        {
+            inputAsset = pInput.actions;
+        }
+        else
+        {
+            inputAsset = Instantiate(playerControls);
+        }
+
+        moveAction = inputAsset.FindActionMap(actionMapName).FindAction(move);
+        lookAction = inputAsset.FindActionMap(actionMapName).FindAction(look);
+        jumpAction = inputAsset.FindActionMap(actionMapName).FindAction(jump);
+        sprintAction = inputAsset.FindActionMap(actionMapName).FindAction(sprint);
+        shootAction = inputAsset.FindActionMap(actionMapName).FindAction("Shoot");
+        
+        moveAction.performed += context => MoveInput = context.ReadValue<Vector2>();
+        moveAction.canceled += context => MoveInput = Vector2.zero;
+
+        lookAction.performed += context => LookInput = context.ReadValue<Vector2>();
+        lookAction.canceled += context => LookInput = Vector2.zero;
+
+        jumpAction.performed += context => JumpTriggered = true;
+
+        sprintAction.performed += context => SprintValue = context.ReadValue<float>();
+        sprintAction.canceled += context => SprintValue = 0.0f;
+
+        shootAction.performed += context => clicks++;
+        
+        inputAsset.FindActionMap(actionMapName).Enable();
     }
 
     void Update()
@@ -127,6 +146,8 @@ public class PlayInputHandler : MonoBehaviour
             JumpTriggered = false;
         }
 
+        transform.Rotate(Vector3.up * LookInput.x * turnSpeed);
+
         Vector3 flatForward = Vector3.ProjectOnPlane(hips.transform.forward, Vector3.up).normalized;
         Vector3 flatRight = Vector3.ProjectOnPlane(hips.transform.right, Vector3.up).normalized;
 
@@ -140,31 +161,16 @@ public class PlayInputHandler : MonoBehaviour
         }
         if (MoveInput.x > 0)
         {
-            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
         }
         if (MoveInput.x < 0)
         {
-            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
         }
 
         
     }
 
-    void RegisterInputActions()
-    {
-        moveAction.performed += context => MoveInput = context.ReadValue<Vector2>();
-        moveAction.canceled += context => MoveInput = Vector2.zero;
-
-        lookAction.performed += context => LookInput = context.ReadValue<Vector2>();
-        lookAction.canceled += context => LookInput = Vector2.zero;
-
-        jumpAction.performed += context => JumpTriggered = true;
-
-        sprintAction.performed += context => SprintValue = context.ReadValue<float>();
-        sprintAction.canceled += context => SprintValue = 0.0f;
-
-        shootAction.performed += context => clicks++;
-    }
 
     void movement(){
     }

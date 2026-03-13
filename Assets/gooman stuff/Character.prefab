@@ -886,6 +886,8 @@ GameObject:
   - component: {fileID: 8093392582326269476}
   - component: {fileID: 5506640306575940949}
   - component: {fileID: 1147923614171221566}
+  - component: {fileID: 1833284422906103700}
+  - component: {fileID: 8362598421601564490}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -1067,13 +1069,78 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6232558680288244034}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 82fcbb0b0dfdde54099eabd753daceac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IgnoreColllision
   thisCollider: {fileID: 0}
   colliderToIgnore: []
+--- !u!114 &1833284422906103700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6232558680288244034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4cb6c456b58edb448a74a14ef94a6f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayInputHandler
+  playerControls: {fileID: -944628639613478452, guid: 22a469b6a22a20b498cf74c834919112, type: 3}
+  actionMapName: Gameplay
+  move: Move
+  look: Look
+  jump: Jump
+  sprint: Sprint
+  vertangle: 0
+  horizangle: 0
+  initialvelocity: 0
+  step: 0
+  max: 0
+  gravity: 0
+  node: {fileID: 7912194281509784377, guid: aae595b9cc9eecd4490da1ac6e92dd43, type: 3}
+  ball: {fileID: 5147396358028833663, guid: 8139cc04d0d67ea4ea856a5286e6bac6, type: 3}
+  angledelta: 0.5
+  powerdelta: 0.5
+  spawntime: 0
+  speed: 50
+  strafeSpeed: 50
+  jumpForce: 50
+  turnSpeed: 0.2
+  hips: {fileID: 0}
+  isGrounded: 0
+--- !u!114 &8362598421601564490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6232558680288244034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 22a469b6a22a20b498cf74c834919112, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Gameplay
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &7183222277558526863
 GameObject:
   m_ObjectHideFlags: 0
