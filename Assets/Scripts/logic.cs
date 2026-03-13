@@ -9,20 +9,10 @@ public class logic : MonoBehaviour
     public int p3score=0;
     public int p4score=0; 
     public int players;
-
-    [Header("Background rotation")]
-    public GameObject[] stars;
-    public float maxrot;
-    public GameObject directionallight;
-    private Vector3 rotationdelta;
-
-    [Header("Action Name References")]
-    public GameObject ball;
-    public Vector3 ballspawn;
-    private GameObject[] balls;
-
     void Start()
     {
+        pop = FindFirstObjectByType<PlanetPop>();
+
         stars = GameObject.FindGameObjectsWithTag("stars");
         rotationdelta = new Vector3(Random.value*maxrot-maxrot/2,Random.value*maxrot-maxrot/2,Random.value*maxrot-maxrot/2);
     }
@@ -51,15 +41,19 @@ public class logic : MonoBehaviour
         {
             case 1:
                 p1score++;
+                pop.Update_UI(1, p1score);
                 break;
             case 2:
                 p2score++;
+                pop.Update_UI(2, p2score);
                 break;
             case 3:
                 p3score++;
+                pop.Update_UI(3, p3score);
                 break;
             case 4:
                 p4score++;
+                pop.Update_UI(4, p4score);
                 break;
         }
     }
