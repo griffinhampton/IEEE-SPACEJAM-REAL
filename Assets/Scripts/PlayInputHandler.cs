@@ -58,7 +58,8 @@ public class PlayInputHandler : MonoBehaviour
     public float strafeSpeed;
     public float jumpForce;
     public float turnSpeed = 2f;
-
+    public float brakingForce = 5f;
+    
     //for context later, use force on ragdolls, dont move their position directly
 
     public Rigidbody hips;
@@ -76,6 +77,8 @@ public class PlayInputHandler : MonoBehaviour
     public float legLiftForce = 40f;
     public float stepRate = 10f;
     private float stepCycle = 0f;
+
+    private static int playerCount = 0;
 
 
     private GameObject[] nodes;
@@ -96,6 +99,12 @@ public class PlayInputHandler : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+        }
+
+        playerCount++;
+        if (playerCount % 2 == 0)
+        {
+            SetTeamColor(Color.blue);
         }
 
         if (hips == null)
@@ -157,6 +166,14 @@ public class PlayInputHandler : MonoBehaviour
             //Debug.Log(clicks);
         }
         movement();
+
+        if (hips != null && hips.position.y < -20f)
+        {
+            transform.position = new Vector3(0, 3, 0);
+            hips.position = new Vector3(0, 3, 0);
+            hips.linearVelocity = Vector3.zero;
+            hips.angularVelocity = Vector3.zero;
+        }
     }
 
     private void FixedUpdate()
@@ -191,10 +208,11 @@ public class PlayInputHandler : MonoBehaviour
         }
 
         // Use MoveRotation to rotate the Rigidbody safely without causing physics collisions/movement
+        // Applied in World Space (lhs * rhs) to act as a proper heading turn regardless of character tilt
         if (Mathf.Abs(LookInput.x) > 0.01f)
         {
             Quaternion turnOffset = Quaternion.Euler(0, LookInput.x * turnSpeed, 0);
-            hips.MoveRotation(hips.rotation * turnOffset);
+            hips.MoveRotation(turnOffset * hips.rotation);
         }
 
         Vector3 flatForward = Vector3.ProjectOnPlane(hips.transform.forward, Vector3.up).normalized;
@@ -253,6 +271,16 @@ public class PlayInputHandler : MonoBehaviour
                     Vector3 move = forceDir * legStepForce;
                     leftLeg.AddForce(move + lift, ForceMode.Force);
                 }
+            }
+        }
+        else if (isGrounded)
+        {
+            // Apply braking force when grounded and not moving input
+            if (hips != null)
+            {
+                 // Using Unity 6+ 'linearVelocity' instead of 'velocity'
+                 Vector3 flatVel = Vector3.ProjectOnPlane(hips.linearVelocity, Vector3.up);
+                 hips.AddForce(-flatVel * brakingForce, ForceMode.Acceleration);
             }
         }
     }
@@ -332,6 +360,14 @@ public class PlayInputHandler : MonoBehaviour
     {
         if (moveAction == null) return;
         playerControls.FindActionMap(actionMapName).Disable();
+    }
+
+    void SetTeamColor(Color color)
+    {
+        foreach (var renderer in GetComponentsInChildren<Renderer>())
+        {
+            renderer.material.color = color;
+        }
     }
 
     void OnCollisionEnter(Collision collider){
