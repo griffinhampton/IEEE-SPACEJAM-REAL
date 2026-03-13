@@ -5,6 +5,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 public class PlayInputHandler : MonoBehaviour
 {
     [Header("Input Action Asset")]
@@ -31,21 +32,39 @@ public class PlayInputHandler : MonoBehaviour
     public float SprintValue {get; private set;}
     public bool ShootTriggered { get; private set;}
 
-    [Header("Shot Variables")]
+    [Header("Shot specifiers")]
     public float vertangle;
     public float horizangle;
     public float initialvelocity;
-    public GameObject node;
     public float step;
     public float max;
     public float gravity;
-    private GameObject[] nodes;
+
+    [Header("Prefabs")]
+    public GameObject node;
     public GameObject ball;
-    private int clicks = 0;
-    private bool increase;
+
+    [Header("Shooting mechanics")]
     public float angledelta = .5f;
     public float powerdelta = .5f;
     public float spawntime;
+
+    [Header("Movement Stuff")]
+    public float speed;
+    public float strafeSpeed;
+    public float jumpForce;
+
+    //for context later, use force on ragdolls, dont move their position directly
+
+    public Rigidbody hips;
+    public bool isGrounded;
+
+
+    private GameObject[] nodes;
+    private int clicks = -1;
+    private bool increase;
+    private float initangle;
+
     public void ResetJump()
     {
         JumpTriggered = false;
@@ -66,6 +85,10 @@ public class PlayInputHandler : MonoBehaviour
             return;
         }
 
+        if (hips == null)
+        {
+            hips = GetComponent<Rigidbody>();
+        }
 
         moveAction = playerControls.FindActionMap(actionMapName).FindAction(move);
         lookAction = playerControls.FindActionMap(actionMapName).FindAction(look);
@@ -77,21 +100,54 @@ public class PlayInputHandler : MonoBehaviour
 
     void Update()
     {
-        //Debug.Log(ShootTriggered);
-        //Physics.gravity = new Vector3(0,gravity,0);
         nodes = GameObject.FindGameObjectsWithTag("node");
         foreach(GameObject node in nodes)
         {
             Destroy(node);
         }
-        if (ShootTriggered)
-        {
-            clicks++;
-            ShootTriggered = false;
-        }
-        if(clicks>=0){
+        if(clicks>=-1){
             Shoot();
+            Debug.Log(clicks);
         }
+        movement();
+    }
+
+    private void FixedUpdate()
+    {
+        if (hips == null)
+        {
+            return;
+        }
+
+        isGrounded = Physics.Raycast(hips.position, Vector3.down, 1.1f);
+
+        if (JumpTriggered && isGrounded)
+        {
+            hips.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            JumpTriggered = false;
+        }
+
+        Vector3 flatForward = Vector3.ProjectOnPlane(hips.transform.forward, Vector3.up).normalized;
+        Vector3 flatRight = Vector3.ProjectOnPlane(hips.transform.right, Vector3.up).normalized;
+
+        if (MoveInput.y > 0)
+        {
+            hips.AddForce(flatForward * speed * Mathf.Abs(MoveInput.y) * (SprintValue + 1));
+        }
+        if (MoveInput.y < 0)
+        {
+            hips.AddForce(-flatForward * speed * Mathf.Abs(MoveInput.y) * (SprintValue + 1));
+        }
+        if (MoveInput.x > 0)
+        {
+            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+        }
+        if (MoveInput.x < 0)
+        {
+            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+        }
+
+        
     }
 
     void RegisterInputActions()
@@ -107,7 +163,10 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction.performed += context => SprintValue = context.ReadValue<float>();
         sprintAction.canceled += context => SprintValue = 0.0f;
 
-        shootAction.performed += context => ShootTriggered = true;
+        shootAction.performed += context => clicks++;
+    }
+
+    void movement(){
     }
 
     public void ShootPreview()
@@ -130,20 +189,21 @@ public class PlayInputHandler : MonoBehaviour
     //[ContextMenu("Shoot ball")]
     public void Shoot()
     {
-        ShootPreview();
+        //ShootPreview();
         switch (clicks){
             case 0:
                 playerControls.FindActionMap(actionMapName).Disable();
                 playerControls.FindActionMap(actionMapName).FindAction("Shoot").Enable();
                 horizangle = transform.rotation.eulerAngles.y;
+                initangle = transform.rotation.eulerAngles.y;
                 initialvelocity = 10;
                 clicks++;
                 break;
             case 1:
                 horizangle = increase?horizangle+angledelta*Time.deltaTime:horizangle-angledelta*Time.deltaTime;
-                if (horizangle - transform.rotation.eulerAngles.y > Mathf.PI / 2 || horizangle - transform.rotation.eulerAngles.y < Mathf.PI / -2)
+                if (horizangle - initangle > Mathf.PI / 4 || horizangle - initangle < Mathf.PI / -4)
                 {
-                    Mathf.Clamp(horizangle,transform.rotation.eulerAngles.y-Mathf.PI/2,transform.rotation.eulerAngles.y+Mathf.PI/2 );
+                    horizangle = Mathf.Clamp(horizangle,initangle-Mathf.PI/4,initangle+Mathf.PI/4);
                     increase = !increase;
                 }
                 break;
@@ -151,7 +211,7 @@ public class PlayInputHandler : MonoBehaviour
                 initialvelocity = increase?initialvelocity+powerdelta*Time.deltaTime:initialvelocity-powerdelta*Time.deltaTime;
                 if (initialvelocity - 10 > 5 || initialvelocity - 10 < -5)
                 {
-                    Mathf.Clamp(initialvelocity,5,15);
+                    initialvelocity = Mathf.Clamp(initialvelocity,5,15);
                     increase = !increase;
                 }
                 break;
