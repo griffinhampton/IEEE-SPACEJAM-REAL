@@ -1168,7 +1168,16 @@ MonoBehaviour:
   jumpForce: 50
   turnSpeed: 0.2
   hips: {fileID: 5420399702372110836}
+  leftHand: {fileID: 8193456267994261674}
+  rightHand: {fileID: 6550628459646580611}
+  handJumpForce: 5
+  handShootForce: 20
   isGrounded: 0
+  leftLeg: {fileID: 1036836070485267900}
+  rightLeg: {fileID: 8020502614951181412}
+  legStepForce: 10
+  legLiftForce: 5
+  stepRate: 5
 --- !u!114 &8362598421601564490
 MonoBehaviour:
   m_ObjectHideFlags: 0
