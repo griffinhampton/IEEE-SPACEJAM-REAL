@@ -140,6 +140,7 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction.canceled += context => SprintValue = 0.0f;
 
         shootAction.performed += context => ShootTriggered = true;
+        shootAction.canceled += context => ShootTriggered = false;
 
         handsUpAction.performed += context => HandsUpPressed = true;
         handsUpAction.canceled += context => HandsUpPressed = false;
@@ -320,7 +321,7 @@ public class PlayInputHandler : MonoBehaviour
                 initialvelocity = 10;
                 clicks++;
                 break;
-            case 1:
+            case -1:
                 horizangle = increase?horizangle+angledelta*Time.deltaTime:horizangle-angledelta*Time.deltaTime;
                 if (horizangle - initangle > Mathf.PI / 4 || horizangle - initangle < Mathf.PI / -4)
                 {
@@ -328,15 +329,16 @@ public class PlayInputHandler : MonoBehaviour
                     increase = !increase;
                 }
                 break;
-            case 2:
+            case 1:
                 initialvelocity = increase?initialvelocity+powerdelta*Time.deltaTime:initialvelocity-powerdelta*Time.deltaTime;
                 if (initialvelocity - 10 > 5 || initialvelocity - 10 < -5)
                 {
                     initialvelocity = Mathf.Clamp(initialvelocity,5,15);
                     increase = !increase;
                 }
+                horizangle = transform.rotation.eulerAngles.y*Mathf.PI/180;
                 break;
-            case 3:
+            case 2:
                 float dx = initialvelocity*Mathf.Cos(vertangle)*Mathf.Sin(horizangle);
                 float dz = initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle);
                 float ay = Physics.gravity.y*.5f;
