@@ -46,6 +46,17 @@ public class PlayInputHandler : MonoBehaviour
     public float angledelta = .5f;
     public float powerdelta = .5f;
     public float spawntime;
+
+    [Header("Movement Stuff")]
+    public float speed;
+    public float strafeSpeed;
+    public float jumpForce;
+
+    //for context later, use force on ragdolls, dont move their position directly
+
+    public Rigidbody hips;
+    public bool isGrounded;
+
     public void ResetJump()
     {
         JumpTriggered = false;
@@ -66,6 +77,10 @@ public class PlayInputHandler : MonoBehaviour
             return;
         }
 
+        if (hips == null)
+        {
+            hips = GetComponent<Rigidbody>();
+        }
 
         moveAction = playerControls.FindActionMap(actionMapName).FindAction(move);
         lookAction = playerControls.FindActionMap(actionMapName).FindAction(look);
@@ -91,6 +106,31 @@ public class PlayInputHandler : MonoBehaviour
         }
         if(clicks>=0){
             Shoot();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (hips == null)
+        {
+            return;
+        }
+
+        if(MoveInput.y > 0)
+        {
+            hips.AddForce(-hips.transform.forward * speed * Mathf.Abs(MoveInput.y) * (SprintValue+1));
+        }
+        if(MoveInput.y < 0)
+        {
+            hips.AddForce(hips.transform.forward * speed * Mathf.Abs(MoveInput.y) * (SprintValue+1));
+        }
+        if(MoveInput.x > 0)
+        {
+            hips.AddForce(-hips.transform.right * speed * Mathf.Abs(MoveInput.x) * (SprintValue+1));
+        }
+        if(MoveInput.x < 0)
+        {
+            hips.AddForce(hips.transform.right * speed * Mathf.Abs(MoveInput.x) * (SprintValue+1));
         }
     }
 
