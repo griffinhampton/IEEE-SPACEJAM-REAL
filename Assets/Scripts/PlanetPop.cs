@@ -54,7 +54,7 @@ public class PlanetPop : MonoBehaviour
         }
         */
     }
-    private int i = 1;
+    //private int i = 1;
     void Update()
     {      /*         //TESTING THE FILE
         if (i < 3)
