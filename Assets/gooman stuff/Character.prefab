@@ -1167,7 +1167,7 @@ MonoBehaviour:
   speed: 40
   strafeSpeed: 40
   jumpForce: 50
-  turnSpeed: 1
+  turnSpeed: 2
   brakingForce: 50
   hips: {fileID: 5420399702372110836}
   leftHand: {fileID: 8193456267994261674}
@@ -1225,6 +1225,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 57586dda-ad3f-4734-96c1-711a55fe6faf
     m_ActionName: 'Gameplay/shoot[/Mouse/leftButton,/DualSenseGamepadHID/rightTrigger,/DualSenseGamepadHID1/rightTrigger]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 45955507-253c-4c8b-9c11-6773b8ce12d8
+    m_ActionName: 'Gameplay/HandsUp[/Keyboard/e]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay
