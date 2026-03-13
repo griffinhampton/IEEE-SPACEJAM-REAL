@@ -5,6 +5,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 public class PlayInputHandler : MonoBehaviour
 {
     [Header("Input Action Asset")]
@@ -47,13 +48,11 @@ public class PlayInputHandler : MonoBehaviour
     public float angledelta = .5f;
     public float powerdelta = .5f;
     public float spawntime;
-    public GameObject ballchild;
 
     [Header("Movement Stuff")]
     public float speed;
     public float strafeSpeed;
     public float jumpForce;
-    public float turnSpeed = 2f; // Speed for looking rotation
 
     //for context later, use force on ragdolls, dont move their position directly
 
@@ -62,10 +61,9 @@ public class PlayInputHandler : MonoBehaviour
 
 
     private GameObject[] nodes;
-    private int clicks = 0;
+    private int clicks = -1;
     private bool increase;
     private float initangle;
-    private bool possession;
 
     public void ResetJump()
     {
@@ -87,14 +85,11 @@ public class PlayInputHandler : MonoBehaviour
             return;
         }
 
-<<<<<<< HEAD
-=======
         if (hips == null)
         {
             hips = GetComponent<Rigidbody>();
         }
 
->>>>>>> 10cb1a34c9e0e88cffd508b2d8f7099d7ba4190a
         moveAction = playerControls.FindActionMap(actionMapName).FindAction(move);
         lookAction = playerControls.FindActionMap(actionMapName).FindAction(look);
         jumpAction = playerControls.FindActionMap(actionMapName).FindAction(jump);
@@ -110,11 +105,9 @@ public class PlayInputHandler : MonoBehaviour
         {
             Destroy(node);
         }
-        if(ShootTriggered&&possession){
-            clicks++;
-        }
-        if(clicks>=0){
+        if(clicks>=-1){
             Shoot();
+            Debug.Log(clicks);
         }
         movement();
     }
@@ -133,11 +126,6 @@ public class PlayInputHandler : MonoBehaviour
             hips.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             JumpTriggered = false;
         }
-
-        // Apply rotation from LookInput
-        // We update the Y angular velocity directly for snappy control
-        Vector3 currentAV = hips.angularVelocity;
-        hips.angularVelocity = new Vector3(currentAV.x, LookInput.x * turnSpeed, currentAV.z);
 
         Vector3 flatForward = Vector3.ProjectOnPlane(hips.transform.forward, Vector3.up).normalized;
         Vector3 flatRight = Vector3.ProjectOnPlane(hips.transform.right, Vector3.up).normalized;
@@ -175,7 +163,7 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction.performed += context => SprintValue = context.ReadValue<float>();
         sprintAction.canceled += context => SprintValue = 0.0f;
 
-        shootAction.performed += context => ShootTriggered = true;
+        shootAction.performed += context => clicks++;
     }
 
     void movement(){
@@ -201,7 +189,7 @@ public class PlayInputHandler : MonoBehaviour
     //[ContextMenu("Shoot ball")]
     public void Shoot()
     {
-        ShootPreview();
+        //ShootPreview();
         switch (clicks){
             case 0:
                 playerControls.FindActionMap(actionMapName).Disable();
@@ -237,8 +225,6 @@ public class PlayInputHandler : MonoBehaviour
                 test.linearVelocity = new Vector3(initialvelocity*Mathf.Cos(vertangle)*Mathf.Sin(horizangle),initialvelocity*Mathf.Sin(vertangle),initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle));
                 playerControls.FindActionMap(actionMapName).Enable();
                 clicks=-1;
-                possession=false;
-                ballchild.SetActive(false);
                 break;
         }
     }
@@ -252,14 +238,5 @@ public class PlayInputHandler : MonoBehaviour
     {
         if (moveAction == null) return;
         playerControls.FindActionMap(actionMapName).Disable();
-    }
-
-    void OnCollisionEnter(Collision collider){
-        if(collider.gameObject.CompareTag("ball")){
-            Debug.Log("grab ball");
-            possession = true;
-            ballchild.SetActive(true);
-            Destroy(collider.gameObject);
-        }
     }
 }
