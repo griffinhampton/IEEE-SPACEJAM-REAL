@@ -9,6 +9,7 @@ TagManager:
   - logic
   - node
   - stars
+  - point
   layers:
   - Default
   - TransparentFX
