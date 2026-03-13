@@ -9,6 +9,18 @@ public class logic : MonoBehaviour
     public int p3score=0;
     public int p4score=0; 
     public int players;
+
+    [Header("Background rotation")]
+    public GameObject[] stars;
+    public float maxrot;
+    public GameObject directionallight;
+    private Vector3 rotationdelta;
+
+    [Header("Ball handling")]
+    public GameObject ball;
+    public Vector3 ballspawn;
+    private GameObject[] balls;
+    public PlanetPop pop;
     void Start()
     {
         pop = FindFirstObjectByType<PlanetPop>();
@@ -30,13 +42,18 @@ public class logic : MonoBehaviour
             }
         }else if(balls.Length==1 && balls[0].transform.position.magnitude > 25){
             Destroy(balls[0]);
-            Instantiate(ball,ballspawn,Quaternion.identity);
+            spawnball();
         }
+    }
+
+    public void spawnball()
+    {
+        Instantiate(ball,ballspawn+new Vector3(Random.value*2,0,Random.value*2),Quaternion.identity);
     }
 
     public void score(int player)
     {
-        Instantiate(ball,ballspawn,Quaternion.identity);
+        spawnball();
         switch (player)
         {
             case 1:
