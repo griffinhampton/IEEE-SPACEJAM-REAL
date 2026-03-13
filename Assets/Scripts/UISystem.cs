@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
+
 public class UISystem : MonoBehaviour
 {
     [SerializeField] private GameObject pause;
@@ -15,11 +17,13 @@ public class UISystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        var gamepad = Gamepad.current;
+
+        if (gamepad.startButton.wasPressedThisFrame)
         {
             pause.SetActive(true);
             effects.SetActive(true);
-            character.gameObject.GetComponent<PlayInputHandler>().enabled = false;
+            Time.timeScale = 0;
         }   
     }
 }

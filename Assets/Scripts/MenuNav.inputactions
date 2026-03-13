@@ -1,0 +1,55 @@
+{
+    "version": 1,
+    "name": "MenuNav",
+    "maps": [
+        {
+            "name": "MenuNav",
+            "id": "8b04086d-2794-4c9d-840a-0c0c9affbb8b",
+            "actions": [
+                {
+                    "name": "Navigate",
+                    "type": "Value",
+                    "id": "5af5870a-2f55-4cfb-b142-0e2659cc0c68",
+                    "expectedControlType": "Vector2",
+                    "processors": "ScaleVector2(x=50,y=50)",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Select",
+                    "type": "Button",
+                    "id": "769b6226-3a9c-4e1e-a1bf-b1a951259b40",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8194ea22-9aae-4422-ac70-c2cd5cbfb951",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Navigate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c664fea3-da8f-46fb-8389-95ce213eb469",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

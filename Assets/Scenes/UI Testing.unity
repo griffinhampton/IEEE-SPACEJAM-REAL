@@ -6539,9 +6539,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   cont: {fileID: 297196001}
+  menu: {fileID: 1151884824}
   exit: {fileID: 247807524}
   effects: {fileID: 290362670}
   character: {fileID: 1328172156}
+  menuNav: {fileID: -944628639613478452, guid: c00c46fc3b397094dba58f4f30209289, type: 3}
+  actionMapName: Menu
+  swtch: Navigation
+  click: Select
 --- !u!1 &735315054
 GameObject:
   m_ObjectHideFlags: 0
@@ -6713,6 +6718,11 @@ MonoBehaviour:
   p3score: 0
   p4score: 0
   players: 0
+  stars: []
+  maxrot: 0
+  directionallight: {fileID: 0}
+  ball: {fileID: 0}
+  ballspawn: {x: 0, y: 0, z: 0}
   pop: {fileID: 0}
 --- !u!4 &754992031
 Transform:
@@ -8086,17 +8096,34 @@ MonoBehaviour:
   look: Look
   jump: Jump
   sprint: Sprint
+  handsUp: HandsUp
   vertangle: 0.785
   horizangle: 0
   initialvelocity: 10
-  node: {fileID: 8349664995646010123, guid: a5dfdc01d3594ff4faf4f2a01a07a2f4, type: 3}
   step: 0.25
   max: 3
   gravity: 0
+  node: {fileID: 8349664995646010123, guid: a5dfdc01d3594ff4faf4f2a01a07a2f4, type: 3}
   ball: {fileID: 5147396358028833663, guid: 8139cc04d0d67ea4ea856a5286e6bac6, type: 3}
+  ballchild: {fileID: 0}
   angledelta: 1
   powerdelta: 0.5
   spawntime: 0.3
+  speed: 0
+  strafeSpeed: 0
+  jumpForce: 0
+  turnSpeed: 2
+  hips: {fileID: 0}
+  leftHand: {fileID: 0}
+  rightHand: {fileID: 0}
+  handJumpForce: 5
+  handShootForce: 20
+  isGrounded: 0
+  leftLeg: {fileID: 0}
+  rightLeg: {fileID: 0}
+  legStepForce: 50
+  legLiftForce: 40
+  stepRate: 10
 --- !u!136 &1328172158
 CapsuleCollider:
   m_ObjectHideFlags: 0
