@@ -49,6 +49,17 @@ public class PlayInputHandler : MonoBehaviour
     public float spawntime;
     public GameObject ballchild;
 
+    [Header("Movement Stuff")]
+    public float speed;
+    public float strafeSpeed;
+    public float jumpForce;
+
+    //for context later, use force on ragdolls, dont move their position directly
+
+    public Rigidbody hips;
+    public bool isGrounded;
+
+
     private GameObject[] nodes;
     private int clicks = 0;
     private bool increase;
@@ -75,6 +86,14 @@ public class PlayInputHandler : MonoBehaviour
             return;
         }
 
+<<<<<<< HEAD
+=======
+        if (hips == null)
+        {
+            hips = GetComponent<Rigidbody>();
+        }
+
+>>>>>>> 10cb1a34c9e0e88cffd508b2d8f7099d7ba4190a
         moveAction = playerControls.FindActionMap(actionMapName).FindAction(move);
         lookAction = playerControls.FindActionMap(actionMapName).FindAction(look);
         jumpAction = playerControls.FindActionMap(actionMapName).FindAction(jump);
@@ -97,6 +116,15 @@ public class PlayInputHandler : MonoBehaviour
             Shoot();
         }
         movement();
+    }
+
+    private void StaticUpdate()
+    {
+        if(hips==null)
+        {
+            return;
+        }
+        //other movement stuff
     }
 
     void RegisterInputActions()
