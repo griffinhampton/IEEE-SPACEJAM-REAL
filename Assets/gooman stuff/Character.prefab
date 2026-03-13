@@ -1173,6 +1173,11 @@ MonoBehaviour:
   handJumpForce: 5
   handShootForce: 20
   isGrounded: 0
+  leftLeg: {fileID: 1036836070485267900}
+  rightLeg: {fileID: 8020502614951181412}
+  legStepForce: 10
+  legLiftForce: 5
+  stepRate: 5
 --- !u!114 &8362598421601564490
 MonoBehaviour:
   m_ObjectHideFlags: 0
