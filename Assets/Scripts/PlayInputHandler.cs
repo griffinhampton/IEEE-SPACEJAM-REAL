@@ -52,6 +52,7 @@ public class PlayInputHandler : MonoBehaviour
     public float speed;
     public float strafeSpeed;
     public float jumpForce;
+    public float turnSpeed = 2f; // Speed for looking rotation
 
     //for context later, use force on ragdolls, dont move their position directly
 
@@ -110,13 +111,47 @@ public class PlayInputHandler : MonoBehaviour
         movement();
     }
 
-    private void StaticUpdate()
+    private void FixedUpdate()
     {
-        if(hips==null)
+        if (hips == null)
         {
             return;
         }
-        //other movement stuff
+
+        isGrounded = Physics.Raycast(hips.position, Vector3.down, 1.1f);
+
+        if (JumpTriggered && isGrounded)
+        {
+            hips.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            JumpTriggered = false;
+        }
+
+        // Apply rotation from LookInput
+        // We update the Y angular velocity directly for snappy control
+        Vector3 currentAV = hips.angularVelocity;
+        hips.angularVelocity = new Vector3(currentAV.x, LookInput.x * turnSpeed, currentAV.z);
+
+        Vector3 flatForward = Vector3.ProjectOnPlane(hips.transform.forward, Vector3.up).normalized;
+        Vector3 flatRight = Vector3.ProjectOnPlane(hips.transform.right, Vector3.up).normalized;
+
+        if (MoveInput.y > 0)
+        {
+            hips.AddForce(flatForward * speed * Mathf.Abs(MoveInput.y) * (SprintValue + 1));
+        }
+        if (MoveInput.y < 0)
+        {
+            hips.AddForce(-flatForward * speed * Mathf.Abs(MoveInput.y) * (SprintValue + 1));
+        }
+        if (MoveInput.x > 0)
+        {
+            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+        }
+        if (MoveInput.x < 0)
+        {
+            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+        }
+
+        
     }
 
     void RegisterInputActions()
