@@ -453,7 +453,7 @@ MonoBehaviour:
   gravity: 0
   ball: {fileID: 5147396358028833663, guid: 8139cc04d0d67ea4ea856a5286e6bac6, type: 3}
   angledelta: 1
-  powerdelta: 0.5
+  powerdelta: 3
   spawntime: 0.3
 --- !u!1 &811326705
 GameObject:
