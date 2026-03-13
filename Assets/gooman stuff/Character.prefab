@@ -1164,10 +1164,11 @@ MonoBehaviour:
   angledelta: 0.5
   powerdelta: 0.5
   spawntime: 0.3
-  speed: 50
-  strafeSpeed: 50
+  speed: 40
+  strafeSpeed: 40
   jumpForce: 50
   turnSpeed: 1
+  brakingForce: 50
   hips: {fileID: 5420399702372110836}
   leftHand: {fileID: 8193456267994261674}
   rightHand: {fileID: 6550628459646580611}
