@@ -9,6 +9,18 @@ public class logic : MonoBehaviour
     public int p3score=0;
     public int p4score=0; 
     public int players;
+
+    [Header("Background rotation")]
+    public GameObject[] stars;
+    public float maxrot;
+    public GameObject directionallight;
+    private Vector3 rotationdelta;
+
+    [Header("Ball handling")]
+    public GameObject ball;
+    public Vector3 ballspawn;
+    private GameObject[] balls;
+    public PlanetPop pop;
     void Start()
     {
         pop = FindFirstObjectByType<PlanetPop>();
