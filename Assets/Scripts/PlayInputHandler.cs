@@ -47,6 +47,7 @@ public class PlayInputHandler : MonoBehaviour
     public float angledelta = .5f;
     public float powerdelta = .5f;
     public float spawntime;
+    public GameObject ballchild;
 
     [Header("Movement Stuff")]
     public float speed;
@@ -64,6 +65,7 @@ public class PlayInputHandler : MonoBehaviour
     private int clicks = 0;
     private bool increase;
     private float initangle;
+    private bool possession;
 
     public void ResetJump()
     {
@@ -85,11 +87,14 @@ public class PlayInputHandler : MonoBehaviour
             return;
         }
 
+<<<<<<< HEAD
+=======
         if (hips == null)
         {
             hips = GetComponent<Rigidbody>();
         }
 
+>>>>>>> 10cb1a34c9e0e88cffd508b2d8f7099d7ba4190a
         moveAction = playerControls.FindActionMap(actionMapName).FindAction(move);
         lookAction = playerControls.FindActionMap(actionMapName).FindAction(look);
         jumpAction = playerControls.FindActionMap(actionMapName).FindAction(jump);
@@ -104,6 +109,9 @@ public class PlayInputHandler : MonoBehaviour
         foreach(GameObject node in nodes)
         {
             Destroy(node);
+        }
+        if(ShootTriggered&&possession){
+            clicks++;
         }
         if(clicks>=0){
             Shoot();
@@ -167,7 +175,7 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction.performed += context => SprintValue = context.ReadValue<float>();
         sprintAction.canceled += context => SprintValue = 0.0f;
 
-        shootAction.performed += context => clicks++;
+        shootAction.performed += context => ShootTriggered = true;
     }
 
     void movement(){
@@ -229,6 +237,8 @@ public class PlayInputHandler : MonoBehaviour
                 test.linearVelocity = new Vector3(initialvelocity*Mathf.Cos(vertangle)*Mathf.Sin(horizangle),initialvelocity*Mathf.Sin(vertangle),initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle));
                 playerControls.FindActionMap(actionMapName).Enable();
                 clicks=-1;
+                possession=false;
+                ballchild.SetActive(false);
                 break;
         }
     }
@@ -242,5 +252,14 @@ public class PlayInputHandler : MonoBehaviour
     {
         if (moveAction == null) return;
         playerControls.FindActionMap(actionMapName).Disable();
+    }
+
+    void OnCollisionEnter(Collision collider){
+        if(collider.gameObject.CompareTag("ball")){
+            Debug.Log("grab ball");
+            possession = true;
+            ballchild.SetActive(true);
+            Destroy(collider.gameObject);
+        }
     }
 }
