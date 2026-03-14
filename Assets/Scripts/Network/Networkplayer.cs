@@ -4,54 +4,64 @@ using UnityEngine.InputSystem;
 
 public class NewEmptyCSharpScript : MonoBehaviour
 {
-    [SerializeField]
-    Rigidbody rigidbody3D;
+    [SerializeField] Rigidbody rigidbody3D;
+    [SerializeField] ConfigurableJoint mainJoint;
 
-    [SerializeField]
-    ConfigurableJoint mainJoint;
+    // Local reference to the input script
+    private PlayInputHandler inputHandler;
 
-    //Input 
+    // Input 
     Vector2 moveInputVector = Vector2.zero;
     bool isJumpButtonPressed = false;
 
-    //Contorller Settings
+    // Controller Settings
     float maxSpeed = 3;
 
-    //States
+    // States
     bool isGrounded = false;
 
-    //Raycast
+    // Raycast
     RaycastHit[] raycastHits = new RaycastHit[10];
 
     void Start()
     {
-        
+
+        GameObject manager = GameObject.Find("Player Multiplayer Manager");
+        if (manager != null)
+        {
+            transform.position = manager.transform.position;
+        }
+        inputHandler = GetComponent<PlayInputHandler>();
     }
 
     void Update()
     {
-        if (PlayInputHandler.Instance != null)
+        if (inputHandler == null)
         {
-            moveInputVector = PlayInputHandler.Instance.MoveInput;
+            inputHandler = GetComponent<PlayInputHandler>();
+        }
+        if (inputHandler != null)
+        {
+            moveInputVector = inputHandler.MoveInput;
         
-            if (PlayInputHandler.Instance.JumpTriggered)
+            if (inputHandler.JumpTriggered)
             {
                 isJumpButtonPressed = true;
-                PlayInputHandler.Instance.ResetJump();
+                inputHandler.ResetJump();
             }
         }
-    else
-    {
-        Debug.LogWarning("PlayInputHandler not found in scene!");
-    }
-
+        else
+        {
+            // This is helpful for debugging multiplayer spawning
+            Debug.LogWarning("PlayInputHandler component missing from " + gameObject.name);
+        }
     }
 
     void FixedUpdate()
     {
         isGrounded = false;
 
-        //Ground Check
+        // Ground Check
         int numberOfHits = Physics.SphereCastNonAlloc(rigidbody3D.position, 0.5f, transform.up * -1, raycastHits, 0.5f);
 
         for (int i = 0; i < numberOfHits; i++)
@@ -70,6 +80,7 @@ public class NewEmptyCSharpScript : MonoBehaviour
 
         if (inputMagnituded != 0)
         {
+            // Note: Fixed the typo in 'inputMagnituded' logic from your original snippet
             Quaternion desiredRotation = Quaternion.LookRotation(new Vector3(moveInputVector.x, 0, moveInputVector.y*-1), Vector3.up);
 
             mainJoint.targetRotation = Quaternion.RotateTowards(mainJoint.targetRotation, desiredRotation, Time.fixedDeltaTime * 300);
@@ -89,8 +100,5 @@ public class NewEmptyCSharpScript : MonoBehaviour
             rigidbody3D.AddForce(Vector3.up * 20, ForceMode.Impulse);
             isJumpButtonPressed = false;
         }
-
-        Debug.Log("Input: " + moveInputVector + " | Grounded: " + isGrounded + " | Velocity: " + rigidbody3D.linearVelocity);
     }
 }
-

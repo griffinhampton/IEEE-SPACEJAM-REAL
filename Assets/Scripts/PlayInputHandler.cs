@@ -1,11 +1,8 @@
-using System;
-using Unity.Mathematics;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.Rendering.LookDev;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
+
 public class PlayInputHandler : MonoBehaviour
 {
     [Header("Input Action Asset")]
@@ -28,11 +25,11 @@ public class PlayInputHandler : MonoBehaviour
     private InputAction shootAction;
     private InputAction handsUpAction;
 
-    public Vector2 MoveInput { get; private set;}
-    public Vector2 LookInput { get; private set;}
-    public bool JumpTriggered { get; private set;}
-    public float SprintValue {get; private set;}
-    public bool ShootTriggered { get; private set;}
+    public Vector2 MoveInput { get; private set; }
+    public Vector2 LookInput { get; private set; }
+    public bool JumpTriggered { get; private set; }
+    public float SprintValue { get; private set; }
+    public bool ShootTriggered { get; private set; }
     public bool HandsUpPressed { get; private set; }
 
     [Header("Shot specifiers")]
@@ -59,32 +56,9 @@ public class PlayInputHandler : MonoBehaviour
     public Rigidbody body;
     public GameObject maincamera;
     public GameObject model;
-    /*public float strafeSpeed;
-    public float jumpForce;
-    public float turnSpeed = 2f;
-    public float brakingForce = 5f;
-    
-
-    public Rigidbody hips;
-    [Header("Hands")]
-    public Rigidbody leftHand;
-    public Rigidbody rightHand;
-    public float handJumpForce = 5f;
-    public float handShootForce = 20f;
-    public bool isGrounded;
-
-    [Header("Legs")]
-    public Rigidbody leftLeg;
-    public Rigidbody rightLeg;
-    public float legStepForce = 50f;
-    public float legLiftForce = 40f;
-    public float stepRate = 10f;
-    private float stepCycle = 0f;
-
-    private static int playerCount = 0;*/
-
-
-    private GameObject[] nodes;
+    private PlayerInput _playerInput;
+    private List<GameObject> myNodes = new List<GameObject>(); 
+    private bool _isAiming = false;
     private int clicks = -1;
     private bool increase;
     private float initangle;
@@ -95,35 +69,11 @@ public class PlayInputHandler : MonoBehaviour
         JumpTriggered = false;
     }
 
-    public static PlayInputHandler Instance { get; private set; }
-
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
+        _playerInput = GetComponent<PlayerInput>();
 
-        /*playerCount++;
-        if (playerCount % 2 == 0)
-        {
-            SetTeamColor(Color.blue);
-        }*/
-
-        /*if (hips == null)
-        {
-            hips = GetComponent<Rigidbody>();
-        }*/
-
-        InputActionAsset inputAsset;
-        if (TryGetComponent<PlayerInput>(out var pInput))
-        {
-            inputAsset = pInput.actions;
-        }
-        else
-        {
-            inputAsset = Instantiate(playerControls);
-        }
+        InputActionAsset inputAsset = _playerInput.actions;
 
         moveAction = inputAsset.FindActionMap(actionMapName).FindAction(move);
         lookAction = inputAsset.FindActionMap(actionMapName).FindAction(look);
@@ -131,7 +81,7 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction = inputAsset.FindActionMap(actionMapName).FindAction(sprint);
         shootAction = inputAsset.FindActionMap(actionMapName).FindAction("Shoot");
         handsUpAction = inputAsset.FindActionMap(actionMapName).FindAction(handsUp);
-        
+
         moveAction.performed += context => MoveInput = context.ReadValue<Vector2>();
         moveAction.canceled += context => MoveInput = Vector2.zero;
 
@@ -144,7 +94,12 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction.performed += context => SprintValue = context.ReadValue<float>();
         sprintAction.canceled += context => SprintValue = 0.0f;
 
-        shootAction.performed += context => ShootTriggered = true;
+        shootAction.performed += context => {
+            if (possession) {
+                clicks++;
+                ShootTriggered = true; 
+            }
+        };
         shootAction.canceled += context => ShootTriggered = false;
 
         handsUpAction.performed += context => HandsUpPressed = true;
@@ -155,275 +110,146 @@ public class PlayInputHandler : MonoBehaviour
 
     void FixedUpdate()
     {
-        movement();
+        if (!_isAiming)
+        {
+            movement();
+        }
     }
+
     void Update()
     {
-        nodes = GameObject.FindGameObjectsWithTag("node");
-        foreach(GameObject node in nodes)
+        foreach (GameObject n in myNodes)
         {
-            Destroy(node);
+            if (n != null) Destroy(n);
         }
-        if (ShootTriggered && possession)
+        myNodes.Clear();
+
+        if (clicks >= 0)
         {
-            Debug.Log(ShootTriggered+" "+possession);
-            clicks++;
-            ShootTriggered = false;
-        }
-        if(clicks>=0){
             Shoot();
-            //Debug.Log(clicks);
         }
-        /*if (hips != null && hips.position.y < -20f)
-        {
-            transform.position = new Vector3(0, 3, 0);
-            hips.position = new Vector3(0, 3, 0);
-            hips.linearVelocity = Vector3.zero;
-            hips.angularVelocity = Vector3.zero;
-        }*/
     }
-
-    /*private void FixedUpdate()
-    {
-        if (hips == null)
-        {
-            return;
-        }
-        isGrounded = false;
-        RaycastHit[] hits = Physics.RaycastAll(hips.position, Vector3.down, 1.1f);
-        foreach (var hit in hits)
-        {
-            if (!hit.collider.isTrigger && !hit.transform.IsChildOf(transform))
-            {
-                isGrounded = true;
-                break;
-            }
-        }
-
-        if (JumpTriggered && isGrounded)
-        {
-            hips.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            if (leftHand != null) leftHand.AddForce(Vector3.up * handJumpForce, ForceMode.Impulse);
-            if (rightHand != null) rightHand.AddForce(Vector3.up * handJumpForce, ForceMode.Impulse);
-            JumpTriggered = false;
-        }
-
-        if (clicks >= 0 || HandsUpPressed)
-        {
-            if (leftHand != null) leftHand.AddForce(Vector3.up * handShootForce, ForceMode.Force);
-            if (rightHand != null) rightHand.AddForce(Vector3.up * handShootForce, ForceMode.Force);
-        }
-
-        // --- ROTATION ---
-        if (Mathf.Abs(LookInput.x) > 0.1f)
-        {
-            // Use time-based rotation instead of multiplier 
-            // Default turnSpeed was 2, which is tiny. We'll use 150 as a hardcoded fast turn or assume user increases it.
-            // But to "overhaul", we force a good value if it's small.
-            float effectiveTurnSpeed = turnSpeed > 10 ? turnSpeed : 180f; 
-            
-            float turnAmount = LookInput.x * effectiveTurnSpeed * Time.fixedDeltaTime;
-            Quaternion turnOffset = Quaternion.Euler(0, turnAmount, 0);
-            hips.MoveRotation(turnOffset * hips.rotation);
-        }
-
-        // --- MOVEMENT ---
-        Vector3 flatForward = Vector3.ProjectOnPlane(hips.transform.forward, Vector3.up).normalized;
-        Vector3 flatRight = Vector3.ProjectOnPlane(hips.transform.right, Vector3.up).normalized;
-
-        Vector3 moveDir = (flatForward * MoveInput.y + flatRight * MoveInput.x);
-        
-        // Analog control
-        if (moveDir.sqrMagnitude > 1) moveDir.Normalize();
-
-        // Calculate Target Velocity
-        // Default speed variable might be small? 
-        float targetSpeedVal = speed > 0 ? speed : 8f; 
-        Vector3 targetVelocity = moveDir * targetSpeedVal * (1f + SprintValue);
-
-        // Get Current Horizontal Velocity
-        Vector3 currentVel = hips.linearVelocity;
-        Vector3 horizontalVel = new Vector3(currentVel.x, 0, currentVel.z);
-
-        // Calculate Velocity Error
-        Vector3 velocityError = targetVelocity - horizontalVel;
-        
-        // Acceleration Factor (P-Controller Gain)
-        // High value = snappy (no sliding), Low value = slippery
-        // We use a high default if not set
-        float effectiveAccel = 20f; 
-
-        // Apply corrective force
-        if (isGrounded)
-        {
-            hips.AddForce(velocityError * effectiveAccel, ForceMode.Acceleration);
-        }
-        else
-        {
-            // Air control (reduced)
-            hips.AddForce(velocityError * effectiveAccel * 0.2f, ForceMode.Acceleration);
-        }
-
-        // Leg Animation
-        if (moveDir.sqrMagnitude > 0.01f && isGrounded)
-        {
-            stepCycle += Time.fixedDeltaTime * stepRate * (1 + SprintValue);
-            if(stepCycle > Mathf.PI * 2) stepCycle -= Mathf.PI * 2;
-
-            float sineValue = Mathf.Sin(stepCycle);
-            Vector3 forceDir = moveDir.normalized;
-
-            if (sineValue > 0)
-            {
-                if (rightLeg != null)
-                {
-                    Vector3 lift = Vector3.up * legLiftForce * sineValue;
-                    Vector3 move = forceDir * legStepForce;
-                    rightLeg.AddForce(move + lift, ForceMode.Force);
-                }
-            }
-            else
-            {
-                if (leftLeg != null) 
-                {
-                    Vector3 lift = Vector3.up * legLiftForce * -sineValue;
-                    Vector3 move = forceDir * legStepForce;
-                    leftLeg.AddForce(move + lift, ForceMode.Force);
-                }
-            }
-        }
-    }*/
-
 
     void movement()
     {
         if (body == null) return;
-        // Crude grounded check
-        bool isGrounded = Mathf.Abs(body.linearVelocity.y) < 0.01f;
-        // Jumping
+
+        // Always use the closest enabled main camera to this player
+        Camera[] cameras = GameObject.FindObjectsOfType<Camera>();
+        Camera closestMainCam = null;
+        float minDist = float.MaxValue;
+        foreach (Camera cam in cameras)
+        {
+            if (cam.enabled && cam.CompareTag("MainCamera"))
+            {
+                float dist = Vector3.Distance(transform.position, cam.transform.position);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    closestMainCam = cam;
+                }
+            }
+        }
+        if (closestMainCam == null) return;
+        maincamera = closestMainCam.gameObject;
+
+        bool isGrounded = Mathf.Abs(body.linearVelocity.y) < 0.1f;
+
         if (JumpTriggered && isGrounded)
         {
             body.AddForce(Vector3.up * jumppower, ForceMode.Impulse);
             JumpTriggered = false;
         }
+
         if (MoveInput.magnitude > 0.2f && isGrounded)
         {
-            //returns the angle from the Z axis from the controller
             float theta = Mathf.Atan2(-1 * MoveInput.y, MoveInput.x);
-            //defines a 2D unit vector along the cameras right vector, with the magnitude of the Movement input
-            Vector3 right = new Vector3(maincamera.transform.right.x, 0, maincamera.transform.right.z);
-            right.Normalize();
+            Vector3 camRight = maincamera.transform.right;
+            Vector3 right = new Vector3(camRight.x, 0, camRight.z).normalized;
+
             Vector3 cambasis = right * MoveInput.magnitude;
-            //rotates cambasis by the angle of the input
             cambasis = new Vector3(cambasis.magnitude * Mathf.Sin(theta), 0, cambasis.magnitude * Mathf.Cos(theta));
+
             body.linearVelocity = new Vector3(cambasis.x * speed, body.linearVelocity.y, cambasis.z * speed);
-            //changes the rotation of the parent object to point to the movement vector
             gameObject.transform.eulerAngles = new Vector3(0, theta * 180 / Mathf.PI, 0);
-            //matches parent object rotation with model render
-            //model.transform.rotation = transform.rotation;
         }
     }
 
     public void ShootPreview()
     {
-        ShootTriggered = false;
-        float dx = initialvelocity*Mathf.Cos(vertangle)*Mathf.Sin(horizangle);
-        float dz = initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle);
-        float ay = Physics.gravity.y*.5f;
-        float vy = initialvelocity*Mathf.Sin(vertangle);
-        if (step <= 0)
+        float dx = initialvelocity * Mathf.Cos(vertangle) * Mathf.Sin(horizangle);
+        float dz = initialvelocity * Mathf.Cos(vertangle) * Mathf.Cos(horizangle);
+        float ay = Physics.gravity.y * .5f;
+        float vy = initialvelocity * Mathf.Sin(vertangle);
+        
+        if (step <= 0) step = .05f;
+
+        for (float t = 0; t < max; t += step)
         {
-            step = .05f;
-        }
-        for(float t = 0; t < max; t += step)
-        {
-            Instantiate(node,gameObject.transform.position + new Vector3(dx*t,ay*t*t + vy*t,dz*t),Quaternion.identity);
+            GameObject n = Instantiate(node, gameObject.transform.position + new Vector3(dx * t, ay * t * t + vy * t, dz * t), Quaternion.identity);
+            myNodes.Add(n); 
         }
     }
 
-    //[ContextMenu("Shoot ball")]
     public void Shoot()
     {
         ShootPreview();
-        switch (clicks){
+        switch (clicks)
+        {
             case 0:
-                playerControls.FindActionMap(actionMapName).Disable();
-                playerControls.FindActionMap(actionMapName).FindAction("Shoot").Enable();
+                _isAiming = true;
                 horizangle = transform.rotation.eulerAngles.y;
                 initangle = transform.rotation.eulerAngles.y;
                 initialvelocity = 10;
                 clicks++;
                 break;
-            case -1:
-                horizangle = increase?horizangle+angledelta*Time.deltaTime:horizangle-angledelta*Time.deltaTime;
-                if (horizangle - initangle > Mathf.PI / 4 || horizangle - initangle < Mathf.PI / -4)
+
+            case -1: 
+                horizangle = increase ? horizangle + angledelta * Time.deltaTime : horizangle - angledelta * Time.deltaTime;
+                if (Mathf.Abs(horizangle - initangle) > Mathf.PI / 4)
                 {
-                    horizangle = Mathf.Clamp(horizangle,initangle-Mathf.PI/4,initangle+Mathf.PI/4);
+                    horizangle = Mathf.Clamp(horizangle, initangle - Mathf.PI / 4, initangle + Mathf.PI / 4);
                     increase = !increase;
                 }
                 break;
-            case 1:
-                initialvelocity = increase?initialvelocity+powerdelta*Time.deltaTime:initialvelocity-powerdelta*Time.deltaTime;
+
+            case 1: 
+                initialvelocity = increase ? initialvelocity + powerdelta * Time.deltaTime : initialvelocity - powerdelta * Time.deltaTime;
                 if (initialvelocity - 10 > 5 || initialvelocity - 10 < -5)
                 {
-                    initialvelocity = Mathf.Clamp(initialvelocity,5,15);
+                    initialvelocity = Mathf.Clamp(initialvelocity, 5, 15);
                     increase = !increase;
                 }
-                horizangle = transform.rotation.eulerAngles.y*Mathf.PI/180;
+                horizangle = transform.rotation.eulerAngles.y * Mathf.PI / 180;
                 break;
-            case 2:
-                float dx = initialvelocity*Mathf.Cos(vertangle)*Mathf.Sin(horizangle);
-                float dz = initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle);
-                float ay = Physics.gravity.y*.5f;
-                float vy = initialvelocity*Mathf.Sin(vertangle);
-                GameObject temp = Instantiate(ball,gameObject.transform.position+new Vector3(dx*spawntime,ay*spawntime*spawntime + vy*spawntime,dz*spawntime),Quaternion.identity);
-                Rigidbody test = temp.GetComponent<Rigidbody>();
-                test.linearVelocity = new Vector3(initialvelocity*Mathf.Cos(vertangle)*Mathf.Sin(horizangle),initialvelocity*Mathf.Sin(vertangle),initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle));
-                playerControls.FindActionMap(actionMapName).Enable();
-                clicks=-1;
+
+            case 2: 
+                float dx = initialvelocity * Mathf.Cos(vertangle) * Mathf.Sin(horizangle);
+                float dz = initialvelocity * Mathf.Cos(vertangle) * Mathf.Cos(horizangle);
+                float ay = Physics.gravity.y * .5f;
+                float vy = initialvelocity * Mathf.Sin(vertangle);
+                
+                GameObject temp = Instantiate(ball, gameObject.transform.position + new Vector3(dx * spawntime, ay * spawntime * spawntime + vy * spawntime, dz * spawntime), Quaternion.identity);
+                Rigidbody ballRb = temp.GetComponent<Rigidbody>();
+                ballRb.linearVelocity = new Vector3(dx, vy, dz);
+
+                _isAiming = false; 
+                clicks = -1;
                 possession = false;
                 ballchild.SetActive(false);
                 break;
         }
     }
 
-    private void OnEnable()
+    private void OnTriggerEnter(Collider other)
     {
-        playerControls.FindActionMap(actionMapName).Enable();
-    }
-
-    private void OnDisable()
-    {
-        if (moveAction == null) return;
-        playerControls.FindActionMap(actionMapName).Disable();
-    }
-
-    void SetTeamColor(Color color)
-    {
-        foreach (var renderer in GetComponentsInChildren<Renderer>())
+        if (other.CompareTag("ball") && !possession)
         {
-            renderer.material.color = color;
-        }
-    }
-
-    /*void OnCollisionEnter(Collision collider){
-        if(collider.gameObject.CompareTag("ball")){
-            Debug.Log("grab ball");
-            possession = true;
-            ballchild.SetActive(true);
-            Destroy(collider.gameObject);
-        }
-    }*/
-
-    void OnTriggerEnter(Collider other)
-    {
-        if(other.CompareTag("ball")){
-            Debug.Log("grab ball");
             possession = true;
             ballchild.SetActive(true);
             Destroy(other.gameObject);
         }
     }
 
-    bool hasBall(){return possession;}
+    public bool HasBall() { return possession; }
 }
