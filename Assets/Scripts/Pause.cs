@@ -45,21 +45,30 @@ public class Pause : MonoBehaviour
         }
 
         InputActionAsset inputAsset;
-
         if (TryGetComponent<PlayerInput>(out var pInput))
         {
             inputAsset = pInput.actions;
         }
         else {
-
             inputAsset = Instantiate(menuNav);
         }
- 
 
-        swtchAction = inputAsset.FindActionMap(actionMapName).FindAction(swtch);
-        clickAction = inputAsset.FindActionMap(actionMapName).FindAction(click);
-        if (Pause.Instance == null)
+        var actionMap = inputAsset.FindActionMap(actionMapName);
+        if (actionMap == null)
         {
+            Debug.LogError($"Pause: Action map '{actionMapName}' not found in InputActionAsset. Check your asset and Inspector settings.");
+            return;
+        }
+        swtchAction = actionMap.FindAction(swtch);
+        if (swtchAction == null)
+        {
+            Debug.LogError($"Pause: Action '{swtch}' not found in action map '{actionMapName}'.");
+            return;
+        }
+        clickAction = actionMap.FindAction(click);
+        if (clickAction == null)
+        {
+            Debug.LogError($"Pause: Action '{click}' not found in action map '{actionMapName}'.");
             return;
         }
         swtchAction.performed += context => swtchInput = context.ReadValue<Vector2>();
@@ -80,37 +89,47 @@ public class Pause : MonoBehaviour
     }
 
     void Update()
-    {              /*
-        Debug.Log(swtchInput);
+    {
+        // Only process if choices are set
+        if (choices == null || choices.Count == 0)
+            return;
+
+        // Handle selection with controller
         if (clickInput)
         {
             choices[select].onClick.Invoke();
+            clickInput = false; // Prevent multiple triggers
         }
-        if (swtchInput.y != 0)
+
+        if (Mathf.Abs(swtchInput.y) > 0.5f)
         {
-            Debug.Log("moved the stick girly" + swtchInput.y);
-            if ((swtchInput.y > 0) && (select != 0))
+            int prevSelect = select;
+            if (swtchInput.y > 0.5f && select > 0)
             {
-                select = select - 1;
+                select--;
             }
-            else if ((swtchInput.y < 0) && (select != 2))
+            else if (swtchInput.y < -0.5f && select < choices.Count - 1)
             {
-                select = select + 1;
+                select++;
+            }
+            if (prevSelect != select)
+            {
+                EventSystem.current.SetSelectedGameObject(choices[select].gameObject);
+                // Prevent rapid navigation
+                swtchInput = Vector2.zero;
             }
         }
-        EventSystem.current.SetSelectedGameObject(choices[select].gameObject);   */
     }
 
-    private void OnEnable() { 
+    private void OnEnable()
+    {
         menuNav.FindActionMap(actionMapName).Enable();
     }
 
-    // Update is called once per frame
     private void disable()
     {
         gameObject.SetActive(false);
         effects.SetActive(false);
         Time.timeScale = 1;
-
     }
 }

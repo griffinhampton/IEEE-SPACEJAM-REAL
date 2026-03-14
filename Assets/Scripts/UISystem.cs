@@ -18,12 +18,15 @@ public class UISystem : MonoBehaviour
     void Update()
     {
         var gamepad = Gamepad.current;
-
+        if (gamepad == null)
+        {
+            return;
+        }
         if (gamepad.startButton.wasPressedThisFrame)
         {
             pause.SetActive(true);
             effects.SetActive(true);
             Time.timeScale = 0;
-        }   
+        }
     }
 }
