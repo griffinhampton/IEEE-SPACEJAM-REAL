@@ -112,9 +112,9 @@ public class logic : MonoBehaviour
 
     public void spawnball()
     {
-        if (gameover) return;
+        //if (gameover) return;
         balls = GameObject.FindGameObjectsWithTag("ball");
-        if (balls.Length > 0) return;
+        //if (balls.Length > 0) return;
         ballPendingSpawn = true;
         ballSpawnTimer = respawnDelay;
     }
@@ -127,7 +127,7 @@ public class logic : MonoBehaviour
 
         balls = GameObject.FindGameObjectsWithTag("ball");
         foreach (GameObject b in balls) Destroy(b);
-
+        Debug.Log(player);
         switch (player)
         {
             case 1:

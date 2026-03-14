@@ -33,28 +33,5 @@ public class goal : MonoBehaviour
         transform.LookAt(cam.transform.position);
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("ball"))
-        {
-            // Score for the OPPOSITE team
-            switch (team)
-            {
-                case 1:
-                    gameLogic.score(2);
-                    break;
-                case 2:
-                    gameLogic.score(1);
-                    break;
-                case 3:
-                    gameLogic.score(4);
-                    break;
-                case 4:
-                    gameLogic.score(3);
-                    break;
-            }
-        }
-    }
-
     public int getTeam() { return team; }
 }
