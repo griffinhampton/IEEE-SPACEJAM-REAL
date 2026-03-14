@@ -7,6 +7,7 @@ public class AI : MonoBehaviour
     public GameObject ballchild;
     public GameObject ball;
     public float spawntime;
+    public float power;
     private bool possession;
     private GameObject[] balls;
     private GameObject[] players;
@@ -30,7 +31,7 @@ public class AI : MonoBehaviour
                 Vector3 unitvector = (GameObject.FindGameObjectWithTag("goal").transform.position - gameObject.transform.position)/(GameObject.FindGameObjectWithTag("goal").transform.position - gameObject.transform.position).magnitude;
                 GameObject temp = Instantiate(ball,gameObject.transform.position+unitvector*spawntime,Quaternion.identity);
                 Rigidbody rb = temp.GetComponent<Rigidbody>();
-                rb.linearVelocity = unitvector*10;
+                rb.linearVelocity = unitvector*power;
                 possession = false;
                 ballchild.SetActive(false);
             }
