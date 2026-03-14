@@ -150,7 +150,6 @@ public class PlayInputHandler : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(swtchInput);
         nodes = GameObject.FindGameObjectsWithTag("node");
         foreach(GameObject node in nodes)
         {

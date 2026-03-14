@@ -80,7 +80,7 @@ public class Pause : MonoBehaviour
     }
 
     void Update()
-    {
+    {              /*
         Debug.Log(swtchInput);
         if (clickInput)
         {
@@ -98,7 +98,7 @@ public class Pause : MonoBehaviour
                 select = select + 1;
             }
         }
-        EventSystem.current.SetSelectedGameObject(choices[select].gameObject);
+        EventSystem.current.SetSelectedGameObject(choices[select].gameObject);   */
     }
 
     private void OnEnable() { 
