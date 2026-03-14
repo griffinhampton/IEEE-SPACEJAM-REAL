@@ -48,10 +48,10 @@ public class cameraMovement : MonoBehaviour
             if (player == null) continue;
 
             Vector3 targetPos = player.transform.position;
-            if (player.hips != null)
+            /*if (player.hips != null)
             {
                 targetPos = player.hips.position;
-            }
+            }*/
 
             if (targetPos.y < onStageYThreshold) continue;
 
