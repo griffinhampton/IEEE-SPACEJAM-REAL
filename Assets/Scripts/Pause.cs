@@ -123,13 +123,16 @@ public class Pause : MonoBehaviour
 
     private void OnEnable()
     {
-        menuNav.FindActionMap(actionMapName).Enable();
+        var actionMap = menuNav.FindActionMap(actionMapName);
+        if (actionMap != null)
+            actionMap.Enable();
     }
 
     private void disable()
     {
         gameObject.SetActive(false);
-        effects.SetActive(false);
+        if (effects != null)
+            effects.SetActive(false);
         Time.timeScale = 1;
     }
 }
