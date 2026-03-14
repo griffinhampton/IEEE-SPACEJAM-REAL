@@ -1078,13 +1078,13 @@ MonoBehaviour:
   ball: {fileID: 5147396358028833663, guid: 8139cc04d0d67ea4ea856a5286e6bac6, type: 3}
   ballspawn: {x: 2.7, y: 13.51, z: 5.12}
   pop: {fileID: 0}
-  gameOverPanel: {fileID: 0}
-  winnerText: {fileID: 0}
-  p1ScoreText: {fileID: 0}
-  p2ScoreText: {fileID: 0}
+  gameOverPanel: {fileID: 18930141}
+  winnerText: {fileID: 59644426}
+  p1ScoreText: {fileID: 892937485}
+  p2ScoreText: {fileID: 125772308}
   p3ScoreText: {fileID: 0}
   p4ScoreText: {fileID: 0}
-  restartText: {fileID: 0}
+  restartText: {fileID: 1890081671}
   scoreSound: {fileID: 0}
   winSound: {fileID: 0}
   backgroundMusic: {fileID: 0}
