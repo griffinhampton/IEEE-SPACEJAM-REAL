@@ -102,10 +102,6 @@ public class logic : MonoBehaviour
             Destroy(balls[0]);
             spawnball();
         }
-        else if (balls.Length == 0 && !ballPendingSpawn && !gameover)
-        {
-            spawnball();
-        }
 
         if (gameover && Input.GetKeyDown(KeyCode.R))
             resetGame();
