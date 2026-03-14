@@ -391,12 +391,22 @@ public class PlayInputHandler : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter(Collision collider){
+    /*void OnCollisionEnter(Collision collider){
         if(collider.gameObject.CompareTag("ball")){
             Debug.Log("grab ball");
             possession = true;
             ballchild.SetActive(true);
             Destroy(collider.gameObject);
+        }
+    }*/
+
+    void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("ball")){
+            Debug.Log("grab ball");
+            possession = true;
+            ballchild.SetActive(true);
+            Destroy(other.gameObject);
         }
     }
 
