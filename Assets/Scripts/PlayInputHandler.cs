@@ -297,20 +297,22 @@ public class PlayInputHandler : MonoBehaviour
 
     void movement()
     {
-        //returns the angle from the Z axis from the controller
-        float theta = Mathf.Atan2(-1*MoveInput.y,MoveInput.x);
-        //defines a 2D unit vector along the cameras right vector, with the magnitude of the Movement input
-        Vector3 right = new Vector3(maincamera.transform.right.x,0,maincamera.transform.right.z);
-        right.Normalize();
-        Vector3 cambasis = right*MoveInput.magnitude;
-        //rotates cambasis by the angle of the input
-        cambasis = new Vector3(cambasis.magnitude*Mathf.Sin(theta),0,cambasis.magnitude*Mathf.Cos(theta));
-        body.linearVelocity = new Vector3(cambasis.x*speed,body.linearVelocity.y,cambasis.z*speed);
-        //changes the rotation of the parent object to point to the movement vector
-        gameObject.transform.eulerAngles = new Vector3(0,theta*180/Mathf.PI,0);
-        Debug.Log(cambasis.magnitude+" "+theta*180/Mathf.PI);
-        //matches parent object rotation with model render
-        //model.transform.rotation = transform.rotation;
+        if(MoveInput.magnitude>.2){
+            //returns the angle from the Z axis from the controller
+            float theta = Mathf.Atan2(-1*MoveInput.y,MoveInput.x);
+            //defines a 2D unit vector along the cameras right vector, with the magnitude of the Movement input
+            Vector3 right = new Vector3(maincamera.transform.right.x,0,maincamera.transform.right.z);
+            right.Normalize();
+            Vector3 cambasis = right*MoveInput.magnitude;
+            //rotates cambasis by the angle of the input
+            cambasis = new Vector3(cambasis.magnitude*Mathf.Sin(theta),0,cambasis.magnitude*Mathf.Cos(theta));
+            body.linearVelocity = new Vector3(cambasis.x*speed,body.linearVelocity.y,cambasis.z*speed);
+            //changes the rotation of the parent object to point to the movement vector
+            gameObject.transform.eulerAngles = new Vector3(0,theta*180/Mathf.PI,0);
+            Debug.Log(cambasis.magnitude+" "+theta*180/Mathf.PI);
+            //matches parent object rotation with model render
+            //model.transform.rotation = transform.rotation;
+        }
     }
 
     public void ShootPreview()
