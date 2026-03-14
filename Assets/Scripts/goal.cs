@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class goal : MonoBehaviour
@@ -6,8 +5,12 @@ public class goal : MonoBehaviour
     public SpriteRenderer sprite;
     public GameObject cam;
     public int team;
+    private logic gameLogic;
+
     void Start()
     {
+        gameLogic = FindFirstObjectByType<logic>();
+
         switch (team)
         {
             case 1:
@@ -25,11 +28,33 @@ public class goal : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         transform.LookAt(cam.transform.position);
     }
 
-    public int getTeam(){return team;}
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("ball"))
+        {
+            // Score for the OPPOSITE team
+            switch (team)
+            {
+                case 1:
+                    gameLogic.score(2);
+                    break;
+                case 2:
+                    gameLogic.score(1);
+                    break;
+                case 3:
+                    gameLogic.score(4);
+                    break;
+                case 4:
+                    gameLogic.score(3);
+                    break;
+            }
+        }
+    }
+
+    public int getTeam() { return team; }
 }
