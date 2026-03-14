@@ -55,7 +55,10 @@ public class PlayInputHandler : MonoBehaviour
 
     [Header("Movement Stuff")]
     public float speed;
-    public float strafeSpeed;
+    public Rigidbody body;
+    public GameObject maincamera;
+    public GameObject model;
+    /*public float strafeSpeed;
     public float jumpForce;
     public float turnSpeed = 2f;
     public float brakingForce = 5f;
@@ -77,7 +80,7 @@ public class PlayInputHandler : MonoBehaviour
     public float stepRate = 10f;
     private float stepCycle = 0f;
 
-    private static int playerCount = 0;
+    private static int playerCount = 0;*/
 
 
     private GameObject[] nodes;
@@ -100,16 +103,16 @@ public class PlayInputHandler : MonoBehaviour
             Instance = this;
         }
 
-        playerCount++;
+        /*playerCount++;
         if (playerCount % 2 == 0)
         {
             SetTeamColor(Color.blue);
-        }
+        }*/
 
-        if (hips == null)
+        /*if (hips == null)
         {
             hips = GetComponent<Rigidbody>();
-        }
+        }*/
 
         InputActionAsset inputAsset;
         if (TryGetComponent<PlayerInput>(out var pInput))
@@ -167,16 +170,16 @@ public class PlayInputHandler : MonoBehaviour
         }
         movement();
 
-        if (hips != null && hips.position.y < -20f)
+        /*if (hips != null && hips.position.y < -20f)
         {
             transform.position = new Vector3(0, 3, 0);
             hips.position = new Vector3(0, 3, 0);
             hips.linearVelocity = Vector3.zero;
             hips.angularVelocity = Vector3.zero;
-        }
+        }*/
     }
 
-    private void FixedUpdate()
+    /*private void FixedUpdate()
     {
         if (hips == null)
         {
@@ -285,10 +288,25 @@ public class PlayInputHandler : MonoBehaviour
                 }
             }
         }
-    }
+    }*/
 
 
-    void movement(){
+    void movement()
+    {
+        //returns the angle from the Z axis from the controller
+        float theta = Mathf.Atan2(-1*MoveInput.y,MoveInput.x);
+        //defines a 2D unit vector along the cameras right vector, with the magnitude of the Movement input
+        Vector3 right = new Vector3(maincamera.transform.right.x,0,maincamera.transform.right.z);
+        right.Normalize();
+        Vector3 cambasis = right*MoveInput.magnitude;
+        //rotates cambasis by the angle of the input
+        cambasis = new Vector3(cambasis.magnitude*Mathf.Sin(theta),0,cambasis.magnitude*Mathf.Cos(theta));
+        body.linearVelocity = new Vector3(cambasis.x*speed,body.linearVelocity.y,cambasis.z*speed);
+        //changes the rotation of the parent object to point to the movement vector
+        gameObject.transform.eulerAngles = new Vector3(0,theta*180/Mathf.PI,0);
+        //Debug.Log(cambasis.magnitude+" "+theta*180/Mathf.PI);
+        //matches parent object rotation with model render
+        //model.transform.rotation = transform.rotation;
     }
 
     public void ShootPreview()
