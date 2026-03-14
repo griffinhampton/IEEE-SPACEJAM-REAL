@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 985506601206770249, guid: e80770acf4b612f4da92f372fca1ea79, type: 3}
+      propertyPath: power
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 4673176461521272056, guid: e80770acf4b612f4da92f372fca1ea79, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.38834
@@ -248,7 +252,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 2
-  m_Color: {r: 0.90943396, g: 0.59869057, b: 0.21105725, a: 1}
+  m_Color: {r: 0.84313726, g: 0.11764706, b: 0.11764706, a: 1}
   m_Intensity: 228.16
   m_Range: 10
   m_SpotAngle: 30
@@ -464,12 +468,15 @@ MonoBehaviour:
   p3score: 0
   p4score: 0
   players: 0
+  winningScore: 7
   stars: []
   maxrot: 10
   directionallight: {fileID: 1370062359}
   ball: {fileID: 5147396358028833663, guid: 8139cc04d0d67ea4ea856a5286e6bac6, type: 3}
   ballspawn: {x: 4.34, y: 15.74, z: 2.53}
   pop: {fileID: 0}
+  gameOverPanel: {fileID: 0}
+  winnerText: {fileID: 0}
 --- !u!4 &427903380
 Transform:
   m_ObjectHideFlags: 0
@@ -666,6 +673,7 @@ MonoBehaviour:
   ballchild: {fileID: 1660676823}
   ball: {fileID: 5147396358028833663, guid: 8139cc04d0d67ea4ea856a5286e6bac6, type: 3}
   spawntime: 2
+  power: 0
 --- !u!136 &628459551
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1409,7 +1417,7 @@ PrefabInstance:
       objectReference: {fileID: 1325193171}
     - target: {fileID: 4696905920671342894, guid: aae595b9cc9eecd4490da1ac6e92dd43, type: 3}
       propertyPath: team
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5286633552409837764, guid: aae595b9cc9eecd4490da1ac6e92dd43, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1532,7 +1540,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 2
-  m_Color: {r: 0.8415094, g: 0.1190814, b: 0.1190814, a: 1}
+  m_Color: {r: 0.84313726, g: 0.48804095, b: 0.11764707, a: 1}
   m_Intensity: 142.27
   m_Range: 10
   m_SpotAngle: 30
@@ -1663,6 +1671,10 @@ PrefabInstance:
       propertyPath: cam
       value: 
       objectReference: {fileID: 1325193171}
+    - target: {fileID: 4696905920671342894, guid: aae595b9cc9eecd4490da1ac6e92dd43, type: 3}
+      propertyPath: team
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 5286633552409837764, guid: aae595b9cc9eecd4490da1ac6e92dd43, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.96
