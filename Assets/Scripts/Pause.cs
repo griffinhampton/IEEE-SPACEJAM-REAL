@@ -12,13 +12,13 @@ public class Pause : MonoBehaviour
     public Button menu;
     public Button exit;
    
-    public GameObject effects;
-    [SerializeField] private GameObject character;
+    //public GameObject effects;
+    //[SerializeField] private GameObject character;
 
     private void Awake()
     {
         cont.onClick.AddListener(() => disable());
-        menu.onClick.AddListener(() => SceneManager.LoadScene("Main Menu"));
+        menu.onClick.AddListener(() => SceneManager.LoadScene("Direct Menu"));
         exit.onClick.AddListener(() => Application.Quit());
   
     }
@@ -26,8 +26,8 @@ public class Pause : MonoBehaviour
     private void disable()
     {
         gameObject.SetActive(false);
-        if (effects != null)
-            effects.SetActive(false);
+     //   if (effects != null)
+     //       effects.SetActive(false);
         Time.timeScale = 1;
     }
 }
