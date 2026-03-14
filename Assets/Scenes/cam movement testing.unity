@@ -313,7 +313,7 @@ MonoBehaviour:
   speed: 10
   body: {fileID: 202537418}
   maincamera: {fileID: 721722624}
-  model: {fileID: 522618585}
+  model: {fileID: 235286650}
 --- !u!136 &202537420
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -410,6 +410,11 @@ Transform:
   - {fileID: 522618586}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &235286650 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7183222277558526863, guid: 63d26ae6668c0724fb47d566e0af0e43, type: 3}
+  m_PrefabInstance: {fileID: 590119873}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &318369099
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -472,11 +477,6 @@ CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 6751549351108634387, guid: 63d26ae6668c0724fb47d566e0af0e43, type: 3}
   m_PrefabInstance: {fileID: 590119873}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &522618585 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6232558680288244034, guid: 63d26ae6668c0724fb47d566e0af0e43, type: 3}
-  m_PrefabInstance: {fileID: 590119873}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &522618586 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 815689881610235781, guid: 63d26ae6668c0724fb47d566e0af0e43, type: 3}
@@ -496,7 +496,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 815689881610235781, guid: 63d26ae6668c0724fb47d566e0af0e43, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.76
+      value: 0.93
       objectReference: {fileID: 0}
     - target: {fileID: 815689881610235781, guid: 63d26ae6668c0724fb47d566e0af0e43, type: 3}
       propertyPath: m_LocalPosition.z

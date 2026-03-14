@@ -304,7 +304,7 @@ public class PlayInputHandler : MonoBehaviour
         body.linearVelocity = new Vector3(cambasis.x*speed,body.linearVelocity.y,cambasis.z*speed);
         //changes the rotation of the parent object to point to the movement vector
         gameObject.transform.eulerAngles = new Vector3(0,theta*180/Mathf.PI,0);
-        //Debug.Log(cambasis.magnitude+" "+theta*180/Mathf.PI);
+        Debug.Log(cambasis.magnitude+" "+theta*180/Mathf.PI);
         //matches parent object rotation with model render
         //model.transform.rotation = transform.rotation;
     }
