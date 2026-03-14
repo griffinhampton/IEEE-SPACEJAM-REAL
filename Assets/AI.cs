@@ -1,3 +1,4 @@
+using UnityEditor.MPE;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -31,10 +32,7 @@ public class AI : MonoBehaviour
     void Update()
     {
         balls = GameObject.FindGameObjectsWithTag("ball");
-        if(balls.Length == 1)
-        {
-            mesh.destination = balls[0].transform.position;
-        }else if (possession)
+        if (possession)
         {
             mesh.destination = goal.transform.position;
             if ((goal.transform.position - gameObject.transform.position).magnitude < 10)
@@ -46,6 +44,9 @@ public class AI : MonoBehaviour
                 possession = false;
                 ballchild.SetActive(false);
             }
+        }else if(balls.Length == 1)
+        {
+            mesh.destination = balls[0].transform.position;
         }
     }
 
