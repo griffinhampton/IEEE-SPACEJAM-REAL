@@ -3,10 +3,12 @@ using UnityEngine;
 public class foreachplayer : MonoBehaviour
     
 {
+    public PlanetPop pop;
     private int robotsRemoved = 0;
+    public GameObject save;
     void Start()
     {
-        
+        pop = save.gameObject.GetComponent<PlanetPop>();
     }
 
     // Update is called once per frame
@@ -28,6 +30,7 @@ public class foreachplayer : MonoBehaviour
         {
             Transform robot = transform.GetChild(0);
             Destroy(robot.gameObject);
+            pop.Playercounter();
             robotsRemoved++;
         }
     }

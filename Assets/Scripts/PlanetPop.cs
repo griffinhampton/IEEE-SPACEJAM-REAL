@@ -13,10 +13,11 @@ public class PlanetPop : MonoBehaviour
     [Header("Player")]
     public GameObject p1;
     public GameObject p2;
-    public GameObject p3;
-    public GameObject p4;
+    // public GameObject p3;
+    // public GameObject p4;
 
 
+    [SerializeField] int playercount = 0;
     private GameObject Active;
     private Transform child;
     private TMP_Text text;
@@ -32,42 +33,38 @@ public class PlanetPop : MonoBehaviour
         //Random.InitState(); //gotta put something for the int
         //determines what parts of the player ui is being shown
         //need to make a class that is not destroyed from main menu to this scene
-        /*
-        gamelogic = FindFirstObjectByType<logic>();
-        switch(playercount)
+        
+        
+    }
+    public void Playercounter()
+    {
+        //gamelogic = FindFirstObjectByType<logic>();
+        playercount = playercount + 1;
+        switch (playercount)
         {
             case 1:
+                p1.SetActive(true);
                 p2.SetActive(false);
-                p3.SetActive(false);
-                p4.SetActive(false);
+                // p3.SetActive(false);
+                // p4.SetActive(false);
                 break;
             case 2:
-                p3.SetActive(false);
-                p4.SetActive(false);
+                p1.SetActive(true);
+                p2.SetActive(true);
+
+                //p3.SetActive(false);
+                //p4.SetActive(false);
                 break;
-            case 3:
-                p4.SetActive(false);
-                break;
-            case 4:
-                break;
+                /*   case 3:
+                       p4.SetActive(false);
+                       break;
+                   case 4:
+                       break;   */
 
         }
-        */
     }
     //private int i = 1;
-    void Update()
-    {      /*         //TESTING THE FILE
-        if (i < 3)
-        {
-            Update_UI(1, i);
-            i = i + 1;
-        }
-        if (i == 3)
-        {
-            Update_UI(2, 1);
-            i = i + 1;
-        }       */
-    }
+
     //have this called each time in logic 
     public void Update_UI(int player, int score)
     {
@@ -81,14 +78,14 @@ public class PlanetPop : MonoBehaviour
                 Active = p2;
                 left_side = -1;
                 break;
-            case 3:
+          /*  case 3:
                 Active = p3;
                 left_side = 1;
                 break;
             case 4:
                 Active = p4;
                 left_side = -1;
-                break;
+                break;  */
         }
         //change the text score
         child = Active.transform.GetChild(0);
@@ -102,13 +99,13 @@ public class PlanetPop : MonoBehaviour
         float xcoord = parent.position.x;
 
         //choose a random planet design of the list of planet prefabs
-        GameObject planet = Instantiate(planets[Random.Range(0,2)], parent);
-        planet.transform.SetParent(parent, true);
+        if (score > 3)
+        {
+            GameObject planet = Instantiate(planets[Random.Range(0, 2)], parent);
+            planet.transform.SetParent(parent, true);
 
-        planet.transform.localPosition = new Vector3(((80 * score) * left_side), 0, 0);
-        Debug.Log("x coordinate: " + xcoord + 80 * score);
-
-       
-
+            planet.transform.localPosition = new Vector3(((80 * score) * left_side), 0, 0);
+            Debug.Log("x coordinate: " + xcoord + 80 * score);
+        }
     }
 }
