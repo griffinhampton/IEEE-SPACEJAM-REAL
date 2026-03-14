@@ -3,15 +3,15 @@
     "name": "MenuNav",
     "maps": [
         {
-            "name": "MenuNav",
+            "name": "Menu",
             "id": "8b04086d-2794-4c9d-840a-0c0c9affbb8b",
             "actions": [
                 {
-                    "name": "Navigate",
+                    "name": "Navigation",
                     "type": "Value",
                     "id": "5af5870a-2f55-4cfb-b142-0e2659cc0c68",
                     "expectedControlType": "Vector2",
-                    "processors": "ScaleVector2(x=50,y=50)",
+                    "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
                 },
@@ -31,9 +31,9 @@
                     "id": "8194ea22-9aae-4422-ac70-c2cd5cbfb951",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "ScaleVector2",
                     "groups": "",
-                    "action": "Navigate",
+                    "action": "Navigation",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

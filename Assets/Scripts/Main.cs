@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+
 
 public class Main : MonoBehaviour
 {
@@ -9,10 +11,14 @@ public class Main : MonoBehaviour
     public Button tut;
     public Button exit;
 
+    public string[] selection = { "full level1", "level2", "level3" }; 
+
     [Header("Other Screen")]
     public GameObject screen;
     private void Start_button()
     {
+        SceneManager.LoadScene(selection[Random.Range(0, 2)]);
+
         screen.SetActive(true);
         gameObject.SetActive(false);
     }
@@ -21,7 +27,7 @@ public class Main : MonoBehaviour
     void Start()
     {
         start.onClick.AddListener(() => Start_button());
-        // tut.onClick.AddListener(() => SceneManager.LoadScene("Tutorial"));
+        tut.onClick.AddListener(() => SceneManager.LoadScene("Tutorial"));
         exit.onClick.AddListener(() => Application.Quit());
     }
 
