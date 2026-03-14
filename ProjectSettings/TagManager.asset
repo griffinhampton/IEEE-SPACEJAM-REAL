@@ -11,6 +11,7 @@ TagManager:
   - stars
   - point
   - gravnode
+  - fnetsource
   layers:
   - Default
   - TransparentFX
