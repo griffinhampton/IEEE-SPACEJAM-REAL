@@ -56,6 +56,7 @@ public class PlayInputHandler : MonoBehaviour
     public Rigidbody body;
     public GameObject maincamera;
     public GameObject model;
+
     private PlayerInput _playerInput;
     private List<GameObject> myNodes = new List<GameObject>(); 
     private bool _isAiming = false;
@@ -72,7 +73,6 @@ public class PlayInputHandler : MonoBehaviour
     private void Awake()
     {
         _playerInput = GetComponent<PlayerInput>();
-
         InputActionAsset inputAsset = _playerInput.actions;
 
         moveAction = inputAsset.FindActionMap(actionMapName).FindAction(move);
@@ -134,10 +134,10 @@ public class PlayInputHandler : MonoBehaviour
     {
         if (body == null) return;
 
-        // Always use the closest enabled main camera to this player
         Camera[] cameras = GameObject.FindObjectsOfType<Camera>();
         Camera closestMainCam = null;
         float minDist = float.MaxValue;
+
         foreach (Camera cam in cameras)
         {
             if (cam.enabled && cam.CompareTag("MainCamera"))
@@ -150,28 +150,37 @@ public class PlayInputHandler : MonoBehaviour
                 }
             }
         }
+
         if (closestMainCam == null) return;
         maincamera = closestMainCam.gameObject;
 
-        bool isGrounded = Mathf.Abs(body.linearVelocity.y) < 0.1f;
+        bool isGrounded = Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, 0.2f);
 
         if (JumpTriggered && isGrounded)
         {
-            body.AddForce(Vector3.up * jumppower, ForceMode.Impulse);
+            body.linearVelocity = new Vector3(body.linearVelocity.x, jumppower, body.linearVelocity.z);
             JumpTriggered = false;
         }
 
-        if (MoveInput.magnitude > 0.2f && isGrounded)
+        if (MoveInput.magnitude > 0.1f)
         {
-            float theta = Mathf.Atan2(-1 * MoveInput.y, MoveInput.x);
+            Vector3 camForward = maincamera.transform.forward;
+            camForward.y = 0;
+            camForward.Normalize();
+
             Vector3 camRight = maincamera.transform.right;
-            Vector3 right = new Vector3(camRight.x, 0, camRight.z).normalized;
+            camRight.y = 0;
+            camRight.Normalize();
 
-            Vector3 cambasis = right * MoveInput.magnitude;
-            cambasis = new Vector3(cambasis.magnitude * Mathf.Sin(theta), 0, cambasis.magnitude * Mathf.Cos(theta));
+            Vector3 moveDir = (camForward * MoveInput.y + camRight * MoveInput.x).normalized;
 
-            body.linearVelocity = new Vector3(cambasis.x * speed, body.linearVelocity.y, cambasis.z * speed);
-            gameObject.transform.eulerAngles = new Vector3(0, theta * 180 / Mathf.PI, 0);
+            body.linearVelocity = new Vector3(moveDir.x * speed, body.linearVelocity.y, moveDir.z * speed);
+
+            if (moveDir != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(moveDir);
+                body.MoveRotation(Quaternion.RotateTowards(transform.rotation, targetRotation, 720f * Time.fixedDeltaTime));
+            }
         }
     }
 

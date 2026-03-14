@@ -242,7 +242,7 @@ MonoBehaviour:
   powerdelta: 3
   spawntime: 0.7
   speed: 5
-  jumppower: 75
+  jumppower: 1000
   body: {fileID: 8360847328380661308}
   maincamera: {fileID: 0}
   model: {fileID: 8753311238233881651}

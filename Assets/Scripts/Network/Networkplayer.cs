@@ -52,7 +52,6 @@ public class NewEmptyCSharpScript : MonoBehaviour
         }
         else
         {
-            // This is helpful for debugging multiplayer spawning
             Debug.LogWarning("PlayInputHandler component missing from " + gameObject.name);
         }
     }
