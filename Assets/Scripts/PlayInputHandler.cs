@@ -60,7 +60,6 @@ public class PlayInputHandler : MonoBehaviour
     public float turnSpeed = 2f;
     public float brakingForce = 5f;
     
-    //for context later, use force on ragdolls, dont move their position directly
 
     public Rigidbody hips;
     [Header("Hands")]
@@ -141,6 +140,7 @@ public class PlayInputHandler : MonoBehaviour
         sprintAction.canceled += context => SprintValue = 0.0f;
 
         shootAction.performed += context => ShootTriggered = true;
+        shootAction.canceled += context => ShootTriggered = false;
 
         handsUpAction.performed += context => HandsUpPressed = true;
         handsUpAction.canceled += context => HandsUpPressed = false;
@@ -207,56 +207,69 @@ public class PlayInputHandler : MonoBehaviour
             if (rightHand != null) rightHand.AddForce(Vector3.up * handShootForce, ForceMode.Force);
         }
 
-        // Use MoveRotation to rotate the Rigidbody safely without causing physics collisions/movement
-        // Applied in World Space (lhs * rhs) to act as a proper heading turn regardless of character tilt
-        if (Mathf.Abs(LookInput.x) > 0.01f)
+        // --- ROTATION ---
+        if (Mathf.Abs(LookInput.x) > 0.1f)
         {
-            Quaternion turnOffset = Quaternion.Euler(0, LookInput.x * turnSpeed, 0);
+            // Use time-based rotation instead of multiplier 
+            // Default turnSpeed was 2, which is tiny. We'll use 150 as a hardcoded fast turn or assume user increases it.
+            // But to "overhaul", we force a good value if it's small.
+            float effectiveTurnSpeed = turnSpeed > 10 ? turnSpeed : 180f; 
+            
+            float turnAmount = LookInput.x * effectiveTurnSpeed * Time.fixedDeltaTime;
+            Quaternion turnOffset = Quaternion.Euler(0, turnAmount, 0);
             hips.MoveRotation(turnOffset * hips.rotation);
         }
 
+        // --- MOVEMENT ---
         Vector3 flatForward = Vector3.ProjectOnPlane(hips.transform.forward, Vector3.up).normalized;
         Vector3 flatRight = Vector3.ProjectOnPlane(hips.transform.right, Vector3.up).normalized;
 
-        if (MoveInput.y > 0)
+        Vector3 moveDir = (flatForward * MoveInput.y + flatRight * MoveInput.x);
+        
+        // Analog control
+        if (moveDir.sqrMagnitude > 1) moveDir.Normalize();
+
+        // Calculate Target Velocity
+        // Default speed variable might be small? 
+        float targetSpeedVal = speed > 0 ? speed : 8f; 
+        Vector3 targetVelocity = moveDir * targetSpeedVal * (1f + SprintValue);
+
+        // Get Current Horizontal Velocity
+        Vector3 currentVel = hips.linearVelocity;
+        Vector3 horizontalVel = new Vector3(currentVel.x, 0, currentVel.z);
+
+        // Calculate Velocity Error
+        Vector3 velocityError = targetVelocity - horizontalVel;
+        
+        // Acceleration Factor (P-Controller Gain)
+        // High value = snappy (no sliding), Low value = slippery
+        // We use a high default if not set
+        float effectiveAccel = 20f; 
+
+        // Apply corrective force
+        if (isGrounded)
         {
-            hips.AddForce(flatForward * speed * Mathf.Abs(MoveInput.y) * (SprintValue + 1));
+            hips.AddForce(velocityError * effectiveAccel, ForceMode.Acceleration);
         }
-        if (MoveInput.y < 0)
+        else
         {
-            hips.AddForce(-flatForward * speed * Mathf.Abs(MoveInput.y) * (SprintValue + 1));
-        }
-        if (MoveInput.x > 0)
-        {
-            hips.AddForce(-flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
-        }
-        if (MoveInput.x < 0)
-        {
-            hips.AddForce(flatRight * speed * Mathf.Abs(MoveInput.x) * (SprintValue + 1));
+            // Air control (reduced)
+            hips.AddForce(velocityError * effectiveAccel * 0.2f, ForceMode.Acceleration);
         }
 
-        if (MoveInput.sqrMagnitude > 0.01f)
+        // Leg Animation
+        if (moveDir.sqrMagnitude > 0.01f && isGrounded)
         {
-            Vector3 forceDir = Vector3.zero;
-            // Match the inverted X axis logic from above
-            if (MoveInput.y > 0) forceDir += flatForward;
-            else if (MoveInput.y < 0) forceDir -= flatForward;
-
-            if (MoveInput.x > 0) forceDir -= flatRight;
-            else if (MoveInput.x < 0) forceDir += flatRight;
-
-            forceDir.Normalize();
-
             stepCycle += Time.fixedDeltaTime * stepRate * (1 + SprintValue);
             if(stepCycle > Mathf.PI * 2) stepCycle -= Mathf.PI * 2;
 
             float sineValue = Mathf.Sin(stepCycle);
+            Vector3 forceDir = moveDir.normalized;
 
             if (sineValue > 0)
             {
                 if (rightLeg != null)
                 {
-                    // Use sine wave to create a step arc
                     Vector3 lift = Vector3.up * legLiftForce * sineValue;
                     Vector3 move = forceDir * legStepForce;
                     rightLeg.AddForce(move + lift, ForceMode.Force);
@@ -266,21 +279,10 @@ public class PlayInputHandler : MonoBehaviour
             {
                 if (leftLeg != null) 
                 {
-                    // Use sine wave (negative part) to create a step arc for left leg
                     Vector3 lift = Vector3.up * legLiftForce * -sineValue;
                     Vector3 move = forceDir * legStepForce;
                     leftLeg.AddForce(move + lift, ForceMode.Force);
                 }
-            }
-        }
-        else if (isGrounded)
-        {
-            // Apply braking force when grounded and not moving input
-            if (hips != null)
-            {
-                 // Using Unity 6+ 'linearVelocity' instead of 'velocity'
-                 Vector3 flatVel = Vector3.ProjectOnPlane(hips.linearVelocity, Vector3.up);
-                 hips.AddForce(-flatVel * brakingForce, ForceMode.Acceleration);
             }
         }
     }
@@ -319,7 +321,7 @@ public class PlayInputHandler : MonoBehaviour
                 initialvelocity = 10;
                 clicks++;
                 break;
-            case 1:
+            case -1:
                 horizangle = increase?horizangle+angledelta*Time.deltaTime:horizangle-angledelta*Time.deltaTime;
                 if (horizangle - initangle > Mathf.PI / 4 || horizangle - initangle < Mathf.PI / -4)
                 {
@@ -327,15 +329,16 @@ public class PlayInputHandler : MonoBehaviour
                     increase = !increase;
                 }
                 break;
-            case 2:
+            case 1:
                 initialvelocity = increase?initialvelocity+powerdelta*Time.deltaTime:initialvelocity-powerdelta*Time.deltaTime;
                 if (initialvelocity - 10 > 5 || initialvelocity - 10 < -5)
                 {
                     initialvelocity = Mathf.Clamp(initialvelocity,5,15);
                     increase = !increase;
                 }
+                horizangle = transform.rotation.eulerAngles.y*Mathf.PI/180;
                 break;
-            case 3:
+            case 2:
                 float dx = initialvelocity*Mathf.Cos(vertangle)*Mathf.Sin(horizangle);
                 float dz = initialvelocity*Mathf.Cos(vertangle)*Mathf.Cos(horizangle);
                 float ay = Physics.gravity.y*.5f;

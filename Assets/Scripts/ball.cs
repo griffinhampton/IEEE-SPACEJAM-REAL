@@ -5,6 +5,7 @@ using UnityEngine;
 public class ball : MonoBehaviour
 {
     public GameObject[] goals;
+    public GameObject[] gravnodes;
     public float goalgravity = 1;
     public Rigidbody body;
     private Vector3 fnet;
@@ -12,6 +13,7 @@ public class ball : MonoBehaviour
     void Start()
     {
         goals = GameObject.FindGameObjectsWithTag("goal");
+        gravnodes = GameObject.FindGameObjectsWithTag("gravnode");
         logicscript = GameObject.FindGameObjectWithTag("logic").GetComponent<logic>();
     }
 
@@ -22,6 +24,10 @@ public class ball : MonoBehaviour
         foreach(GameObject goal in goals)
         {
             fnet += goalgravity*(goal.transform.position-gameObject.transform.position)/Mathf.Pow(Vector3.Distance(gameObject.transform.position,goal.transform.position),2);
+        }
+        foreach(GameObject gravnodes in gravnodes)
+        {
+            fnet += goalgravity*(gravnodes.transform.position-gameObject.transform.position)/Mathf.Pow(Vector3.Distance(gameObject.transform.position,gravnodes.transform.position),2);
         }
         body.linearVelocity += (fnet/body.mass)*Time.deltaTime;
     }

@@ -10,6 +10,7 @@ TagManager:
   - node
   - stars
   - point
+  - gravnode
   layers:
   - Default
   - TransparentFX
