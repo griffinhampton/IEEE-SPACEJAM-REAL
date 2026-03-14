@@ -55,6 +55,7 @@ public class PlayInputHandler : MonoBehaviour
 
     [Header("Movement Stuff")]
     public float speed;
+    public float jumppower = 10;
     public Rigidbody body;
     public GameObject maincamera;
     public GameObject model;
@@ -138,6 +139,7 @@ public class PlayInputHandler : MonoBehaviour
         lookAction.canceled += context => LookInput = Vector2.zero;
 
         jumpAction.performed += context => JumpTriggered = true;
+        jumpAction.canceled += context => JumpTriggered = false;
 
         sprintAction.performed += context => SprintValue = context.ReadValue<float>();
         sprintAction.canceled += context => SprintValue = 0.0f;
@@ -151,6 +153,10 @@ public class PlayInputHandler : MonoBehaviour
         inputAsset.FindActionMap(actionMapName).Enable();
     }
 
+    void FixedUpdate()
+    {
+        movement();
+    }
     void Update()
     {
         nodes = GameObject.FindGameObjectsWithTag("node");
@@ -168,8 +174,6 @@ public class PlayInputHandler : MonoBehaviour
             Shoot();
             //Debug.Log(clicks);
         }
-        movement();
-
         /*if (hips != null && hips.position.y < -20f)
         {
             transform.position = new Vector3(0, 3, 0);
