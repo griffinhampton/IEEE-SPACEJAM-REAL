@@ -19,7 +19,7 @@ public class Main : MonoBehaviour
     {
         SceneManager.LoadScene(selection[Random.Range(0, 2)]);
 
-        screen.SetActive(true);
+        //screen.SetActive(true);
         gameObject.SetActive(false);
     }
 

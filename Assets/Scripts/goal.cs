@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class goal : MonoBehaviour
@@ -6,8 +5,12 @@ public class goal : MonoBehaviour
     public SpriteRenderer sprite;
     public GameObject cam;
     public int team;
+    private logic gameLogic;
+
     void Start()
     {
+        gameLogic = FindFirstObjectByType<logic>();
+
         switch (team)
         {
             case 1:
@@ -25,11 +28,10 @@ public class goal : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         transform.LookAt(cam.transform.position);
     }
 
-    public int getTeam(){return team;}
+    public int getTeam() { return team; }
 }
