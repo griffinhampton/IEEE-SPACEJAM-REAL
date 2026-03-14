@@ -99,7 +99,7 @@ public class PlanetPop : MonoBehaviour
         float xcoord = parent.position.x;
 
         //choose a random planet design of the list of planet prefabs
-        if (score > 3)
+        if (score < 4)
         {
             GameObject planet = Instantiate(planets[Random.Range(0, 2)], parent);
             planet.transform.SetParent(parent, true);

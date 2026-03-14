@@ -30,11 +30,6 @@ public class logic : MonoBehaviour
     [Header("UI")]
     public GameObject gameOverPanel;
     public TMP_Text winnerText;
-    public TMP_Text p1ScoreText;
-    public TMP_Text p2ScoreText;
-    public TMP_Text p3ScoreText;
-    public TMP_Text p4ScoreText;
-    public TMP_Text restartText;
 
     [Header("Audio")]
     public AudioSource scoreSound;
@@ -69,7 +64,6 @@ public class logic : MonoBehaviour
             backgroundMusic.Play();
         }
 
-        UpdateAllScoreUI();
         spawnball();
     }
 
@@ -133,25 +127,21 @@ public class logic : MonoBehaviour
             case 1:
                 p1score++;
                 pop?.Update_UI(1, p1score);
-                UpdateScoreText(p1ScoreText, p1score);
                 if (p1score >= winningScore) winGame(1); else spawnball();
                 break;
             case 2:
                 p2score++;
                 pop?.Update_UI(2, p2score);
-                UpdateScoreText(p2ScoreText, p2score);
                 if (p2score >= winningScore) winGame(2); else spawnball();
                 break;
             case 3:
                 p3score++;
                 pop?.Update_UI(3, p3score);
-                UpdateScoreText(p3ScoreText, p3score);
                 if (p3score >= winningScore) winGame(3); else spawnball();
                 break;
             case 4:
                 p4score++;
                 pop?.Update_UI(4, p4score);
-                UpdateScoreText(p4ScoreText, p4score);
                 if (p4score >= winningScore) winGame(4); else spawnball();
                 break;
         }
@@ -167,9 +157,8 @@ public class logic : MonoBehaviour
         GameObject[] allBalls = GameObject.FindGameObjectsWithTag("ball");
         foreach (GameObject b in allBalls) Destroy(b);
 
-        if (gameOverPanel != null) gameOverPanel.SetActive(true);
-        if (winnerText != null) winnerText.text = "Player " + player + " Wins!";
-        if (restartText != null) restartText.text = "Press R to Restart\nPress ESC for Main Menu";
+        gameOverPanel.SetActive(true);
+        winnerText.text = "Player " + player + " Wins!\nPress R to Restart\nPress ESC for Main Menu";
     }
 
     public void resetGame()
@@ -181,8 +170,6 @@ public class logic : MonoBehaviour
         pop?.Update_UI(2, 0);
         pop?.Update_UI(3, 0);
         pop?.Update_UI(4, 0);
-
-        UpdateAllScoreUI();
 
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
 
@@ -198,14 +185,6 @@ public class logic : MonoBehaviour
     void UpdateScoreText(TMP_Text t, int score)
     {
         if (t != null) t.text = score.ToString();
-    }
-
-    void UpdateAllScoreUI()
-    {
-        UpdateScoreText(p1ScoreText, p1score);
-        UpdateScoreText(p2ScoreText, p2score);
-        UpdateScoreText(p3ScoreText, p3score);
-        UpdateScoreText(p4ScoreText, p4score);
     }
 
     public void GoToMainMenu()
