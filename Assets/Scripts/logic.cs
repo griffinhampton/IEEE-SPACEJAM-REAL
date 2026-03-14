@@ -72,7 +72,6 @@ public class logic : MonoBehaviour
         {
             case 1:
                 p1score++;
-<<<<<<< HEAD
                 pop.Update_UI(1, p1score);
                 if(p1score>=winningScore) winGame(1);
                 break;
@@ -90,21 +89,6 @@ public class logic : MonoBehaviour
                 p4score++;
                 pop.Update_UI(4, p4score);
                 if(p4score>=winningScore)winGame(4);
-=======
-                //pop.Update_UI(1, p1score);
-                break;
-            case 2:
-                p2score++;
-                //pop.Update_UI(2, p2score);
-                break;
-            case 3:
-                p3score++;
-                //pop.Update_UI(3, p3score);
-                break;
-            case 4:
-                p4score++;
-                //pop.Update_UI(4, p4score);
->>>>>>> 6660ba5492958a418f5da7851ab62fa4a37aa066
                 break;
         }
     }
