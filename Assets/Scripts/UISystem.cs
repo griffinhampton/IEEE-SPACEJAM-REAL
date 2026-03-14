@@ -1,17 +1,21 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using System.Collections;
 
 public class UISystem : MonoBehaviour
 {
     [SerializeField] private GameObject pause;
+
     //[SerializeField] private GameObject character;
     //public GameObject effects;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         pause.SetActive(false);
-     //   effects.SetActive(false);
+ 
+        
+    //    effects.SetActive(false);
     }
 
     // Update is called once per frame
@@ -25,8 +29,8 @@ public class UISystem : MonoBehaviour
         if (gamepad.startButton.wasPressedThisFrame)
         {
             pause.SetActive(true);
-        //    effects.SetActive(true);
-            Time.timeScale = 0;
+
+            //    effects.SetActive(true);
         }
     }
 }

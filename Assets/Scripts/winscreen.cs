@@ -14,9 +14,11 @@ public class winscreen : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current.rKey.wasPressedThisFrame)
+        var gamepad = Gamepad.current;
+        if ((Keyboard.current.rKey.wasPressedThisFrame)|| (gamepad.buttonEast.wasPressedThisFrame) || (Keyboard.current.escapeKey.wasPressedThisFrame))
         {
-            SceneManager.LoadScene("menu");
+            SceneManager.LoadScene("Direct Menu");
         }
+      
     }
 }

@@ -19,13 +19,12 @@ public class GamepadCursor : MonoBehaviour
     {
         //get x button
 
-
             //get thumbstick
-            thumb1 = Gamepad.current.leftStick.ReadValue();
+        thumb1 = Gamepad.current.leftStick.ReadValue();
         thumb2 = Gamepad.current.rightStick.ReadValue();
 
         mouse = Mouse.current.position.ReadValue();
-        Vector2 newPosition = mouse + (thumb1 + thumb2) * cursorSpeed * Time.deltaTime;
+        Vector2 newPosition = mouse + (thumb1 + thumb2) * cursorSpeed * Time.unscaledDeltaTime;
 
         Mouse.current.WarpCursorPosition(newPosition);
     
